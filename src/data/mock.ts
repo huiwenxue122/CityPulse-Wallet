@@ -132,6 +132,7 @@ export const offers: Offer[] = [
     finalPrice: 14.20,
     address: "Tucholskystraße 32",
     coords: { x: 45, y: 60 },
+    geo: { lat: 52.5260, lng: 13.3940 },
   },
 ];
 
