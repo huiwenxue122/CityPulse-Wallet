@@ -17,7 +17,19 @@ export type Offer = {
   finalPrice: number;
   address: string;
   coords: { x: number; y: number };
+  geo: { lat: number; lng: number };
 };
+
+// Bounding box used to map lat/lng → SVG percentage coords on the stylized map.
+// Roughly covers Berlin Mitte.
+export const mapBounds = {
+  minLat: 52.515,
+  maxLat: 52.534,
+  minLng: 13.385,
+  maxLng: 13.420,
+};
+
+export const cityCenter = { lat: 52.5244, lng: 13.4025 }; // Berlin Mitte fallback
 
 export const cityContext = {
   district: "Berlin Mitte",
@@ -57,6 +69,7 @@ export const offers: Offer[] = [
     finalPrice: 6.30,
     address: "Rosenthaler Str. 38",
     coords: { x: 38, y: 42 },
+    geo: { lat: 52.5258, lng: 13.4015 },
   },
   {
     id: "of-2",
@@ -77,6 +90,7 @@ export const offers: Offer[] = [
     finalPrice: 6.30,
     address: "Auguststraße 11",
     coords: { x: 55, y: 30 },
+    geo: { lat: 52.5275, lng: 13.3960 },
   },
   {
     id: "of-3",
@@ -97,6 +111,7 @@ export const offers: Offer[] = [
     finalPrice: 10.00,
     address: "Alexanderplatz 7",
     coords: { x: 72, y: 55 },
+    geo: { lat: 52.5219, lng: 13.4132 },
   },
   {
     id: "of-4",
@@ -117,6 +132,7 @@ export const offers: Offer[] = [
     finalPrice: 14.20,
     address: "Tucholskystraße 32",
     coords: { x: 45, y: 60 },
+    geo: { lat: 52.5260, lng: 13.3940 },
   },
 ];
 
