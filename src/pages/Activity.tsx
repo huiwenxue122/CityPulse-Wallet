@@ -66,7 +66,7 @@ const Activity = () => {
             <KPI icon={<Sparkles className="h-4 w-4" />} label="Offers generated" value={merchantAnalytics.offersGenerated.toString()} trend="+12%" />
             <KPI icon={<Target className="h-4 w-4" />} label="Conversion" value={`${merchantAnalytics.conversionRate}%`} trend="+3.4pp" />
             <KPI icon={<Receipt className="h-4 w-4" />} label="Redemptions" value={merchantAnalytics.redemptions.toString()} trend="+8" />
-            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Revenue" value={`€${merchantAnalytics.incrementalRevenue}`} trend="+€240" />
+            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Revenue" value={locale.formatPrice(merchantAnalytics.incrementalRevenue)} trend={`+${locale.formatPrice(240)}`} />
           </div>
 
           <div className="rounded-2xl bg-card border border-border p-4">
