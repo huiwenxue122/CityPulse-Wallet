@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { merchantAnalytics } from "@/data/mock";
 import { Sparkles, Target, Clock, Tag, MapPin, Palette, ArrowLeft, TrendingUp, Receipt, Eye, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/context/LocaleContext";
 
 const goals = ["Increase afternoon foot traffic", "Sell slow inventory", "Attract new customers", "Boost weekday lunch"];
 const tones = ["Cozy & local", "Student-friendly", "Premium", "Playful"];
