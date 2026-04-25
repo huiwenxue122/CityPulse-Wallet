@@ -64,7 +64,7 @@ const Redeem = () => {
           <Receipt className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold text-sm text-foreground">Merchant credited instantly</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{merchant.name} received € {offer.finalPrice.toFixed(2)}. A digital receipt has been added to your Activity.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{merchant.name} received {locale.formatPrice(offer.finalPrice)}. A digital receipt has been added to your Activity.</p>
           </div>
         </div>
       </section>
