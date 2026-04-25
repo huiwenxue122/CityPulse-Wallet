@@ -57,6 +57,16 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     country: "Germany",
   });
 
+  // Auto-acquire location once on mount so currency/place are correct app-wide.
+  useEffect(() => {
+    if (!("geolocation" in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => { /* keep Berlin fallback silently */ },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 5 * 60 * 1000 }
+    );
+  }, []);
+
   useEffect(() => {
     if (!geo) return;
     let cancelled = false;
