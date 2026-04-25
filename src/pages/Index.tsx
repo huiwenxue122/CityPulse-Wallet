@@ -2,11 +2,13 @@ import { MobileShell } from "@/components/MobileShell";
 import { WalletCard } from "@/components/WalletCard";
 import { CityContextCard } from "@/components/CityContextCard";
 import { OfferCard } from "@/components/OfferCard";
-import { offers, user } from "@/data/mock";
+import { user } from "@/data/mock";
 import { ArrowDownToLine, ArrowUpFromLine, Send, Plus, Bell, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLocalizedOffers } from "@/hooks/useLocalizedOffers";
 
 const Index = () => {
+  const offers = useLocalizedOffers();
   const bestOffer = offers[0];
   return (
     <MobileShell>
