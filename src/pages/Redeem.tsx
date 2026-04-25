@@ -29,7 +29,7 @@ const Redeem = () => {
         </div>
         <div className="relative text-center mt-4">
           <p className="text-[11px] uppercase tracking-wider opacity-90 font-semibold">Payment confirmed</p>
-          <h1 className="font-display font-extrabold text-2xl mt-1">€ {offer.finalPrice.toFixed(2)} paid</h1>
+          <h1 className="font-display font-extrabold text-2xl mt-1">{locale.formatPrice(offer.finalPrice)} paid</h1>
           <p className="text-sm opacity-90 mt-1">to {merchant.name}</p>
         </div>
       </div>
