@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Offer } from "@/data/mock";
 import { Clock, MapPin, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatDistance } from "@/lib/places";
 
 const fmtCountdown = (min: number) => {
   if (min < 60) return `${min}m left`;
@@ -37,7 +38,7 @@ export const OfferCard = ({ offer, compact = false }: { offer: Offer; compact?: 
           )}
 
           <div className="mt-2.5 flex items-center gap-3 text-[11px] text-muted-foreground font-medium">
-            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{offer.distanceM}m</span>
+            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{formatDistance(offer.distanceM)}</span>
             <span className="flex items-center gap-1 text-warning"><Clock className="h-3 w-3" />{fmtCountdown(offer.expiresInMin)}</span>
           </div>
         </div>

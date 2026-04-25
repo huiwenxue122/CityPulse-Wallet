@@ -5,14 +5,20 @@ import { ChevronLeft, MapPin, Clock, Sparkles, ShieldCheck, Star } from "lucide-
 import { cn } from "@/lib/utils";
 import { useLocalizedOffer } from "@/hooks/useLocalizedOffers";
 import { useLocale } from "@/context/LocaleContext";
+import { formatDistance } from "@/lib/places";
 
 const OfferDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const offer = useLocalizedOffer(id);
   const locale = useLocale();
-  const merchantTpl = merchants.find(m => m.id === offer.merchantId)!;
-  const merchant = { ...merchantTpl, name: offer.merchant, address: offer.address };
+  const merchantTpl = merchants.find(m => m.id === offer.merchantId);
+  const merchant = {
+    name: offer.merchant,
+    address: offer.address,
+    rating: merchantTpl?.rating ?? 4.6,
+    category: offer.category,
+  };
 
   return (
     <MobileShell hideNav>
@@ -44,7 +50,7 @@ const OfferDetail = () => {
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-2 pt-4 border-t border-border">
-          <Info icon={<MapPin className="h-3.5 w-3.5" />} label="Distance" value={`${offer.distanceM}m away`} />
+          <Info icon={<MapPin className="h-3.5 w-3.5" />} label="Distance" value={`${formatDistance(offer.distanceM)} away`} />
           <Info icon={<Clock className="h-3.5 w-3.5 text-warning" />} label="Expires" value={`${offer.expiresInMin} min`} />
         </div>
       </div>

@@ -11,7 +11,7 @@ const Redeem = () => {
   const { id } = useParams();
   const offer = useLocalizedOffer(id);
   const locale = useLocale();
-  const merchantTpl = merchants.find(m => m.id === offer.merchantId)!;
+  const merchantTpl = merchants.find(m => m.id === offer.merchantId);
   const merchant = { ...merchantTpl, name: offer.merchant };
   const [shown, setShown] = useState(false);
   useEffect(() => { const t = setTimeout(() => setShown(true), 50); return () => clearTimeout(t); }, []);

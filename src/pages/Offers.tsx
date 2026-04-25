@@ -3,14 +3,19 @@ import { CityContextCard } from "@/components/CityContextCard";
 import { OfferCard } from "@/components/OfferCard";
 import { useLocalizedOffers } from "@/hooks/useLocalizedOffers";
 import { Sparkles, SlidersHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-
-const filters = ["All", "Café", "Bakery", "Lunch", "Bookstore Café"];
 
 const Offers = () => {
   const [active, setActive] = useState("All");
-  const offers = useLocalizedOffers();
+  const { offers, isLoading, isRealtime } = useLocalizedOffers();
+  const filters = useMemo(
+    () => ["All", ...Array.from(new Set(offers.map((o) => o.category)))],
+    [offers]
+  );
+  useEffect(() => {
+    if (!filters.includes(active)) setActive("All");
+  }, [active, filters]);
   const filtered = active === "All" ? offers : offers.filter(o => o.category === active);
 
   return (
@@ -20,10 +25,16 @@ const Offers = () => {
           <div>
             <div className="flex items-center gap-1.5">
               <Sparkles className="h-4 w-4 text-primary" />
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">AI Offer Feed</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+                {isRealtime ? "Live Nearby Places" : "AI Offer Feed"}
+              </p>
             </div>
             <h1 className="font-display font-extrabold text-2xl text-foreground mt-1">Curated for now</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">{offers.length} offers matched to this moment</p>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {isLoading
+                ? "Looking up real places near you..."
+                : `${offers.length} ${isRealtime ? "real places" : "demo offers"} matched to this moment`}
+            </p>
           </div>
           <button className="h-10 w-10 grid place-items-center rounded-full bg-secondary border border-border">
             <SlidersHorizontal className="h-4 w-4 text-foreground" />

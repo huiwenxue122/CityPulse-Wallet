@@ -78,9 +78,16 @@ export const projectToPct = (
 /** Free reverse-geocoding via OpenStreetMap (no key, low volume OK for demo). */
 export const reverseGeocode = async (lat: number, lng: number) => {
   try {
+    const params = new URLSearchParams({
+      format: "json",
+      lat: String(lat),
+      lon: String(lng),
+      zoom: "14",
+      "accept-language": "en",
+    });
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14`,
-      { headers: { Accept: "application/json" } }
+      `https://nominatim.openstreetmap.org/reverse?${params.toString()}`,
+      { headers: { Accept: "application/json", "Accept-Language": "en" } }
     );
     if (!res.ok) return null;
     const data = await res.json();

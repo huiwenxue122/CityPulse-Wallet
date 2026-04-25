@@ -5,12 +5,13 @@ import { Link } from "react-router-dom";
 import { MapPin, Navigation, LocateFixed, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  buildLocalOffers,
   buildLocalBounds,
   projectToPct,
 } from "@/lib/localOffers";
 import { useLocale } from "@/context/LocaleContext";
 import { toast } from "sonner";
+import { useLocalizedOffers } from "@/hooks/useLocalizedOffers";
+import { formatDistance } from "@/lib/places";
 
 type GeoState =
   | { status: "idle" }
@@ -22,6 +23,7 @@ const Map = () => {
   const locale = useLocale();
   const [geo, setGeo] = useState<GeoState>({ status: "idle" });
   const [selectedId, setSelectedId] = useState<string>(fallbackOffers[0].id);
+  const { offers: localOffers, isLoading, isRealtime } = useLocalizedOffers();
 
   const requestLocation = () => {
     if (!("geolocation" in navigator)) {
@@ -60,10 +62,6 @@ const Map = () => {
     return cityCenter;
   }, [geo, locale.geo]);
 
-  const localOffers = useMemo(
-    () => buildLocalOffers(userGeo, locale.district),
-    [userGeo, locale.district]
-  );
   const bounds = useMemo(() => buildLocalBounds(userGeo), [userGeo]);
   const userPct = useMemo(
     () => projectToPct(bounds, userGeo.lat, userGeo.lng),
@@ -72,7 +70,7 @@ const Map = () => {
 
   const selected =
     localOffers.find((o) => o.id === selectedId) ?? localOffers[0];
-  const isLive = geo.status === "ready";
+  const isLive = geo.status === "ready" && isRealtime;
 
   return (
     <MobileShell>
@@ -165,7 +163,7 @@ const Map = () => {
               </p>
               <p className="text-[10px] text-muted-foreground leading-tight truncate">
                 {geo.status === "ready" &&
-                  `${locale.city} · ${locale.currency} · ±${Math.round(geo.accuracy)}m`}
+                  `${locale.city} · ${isLoading ? "finding places" : isRealtime ? "live places" : "demo offers"} · ±${Math.round(geo.accuracy)}m`}
                 {geo.status === "loading" && "Locating…"}
                 {geo.status === "denied" && "Location off — demo mode"}
                 {geo.status === "error" && "Location unavailable — demo mode"}
@@ -209,12 +207,10 @@ const Map = () => {
                 {selected.title}
               </h3>
               <p className="text-xs text-muted-foreground mt-1">
-                {selected.distanceM < 1000
-                  ? `${selected.distanceM}m`
-                  : `${(selected.distanceM / 1000).toFixed(1)}km`}
+                {formatDistance(selected.distanceM)}
                 {" · "}
                 {selected.expiresInMin}m left
-                {isLive && <span className="ml-1 text-success">• live</span>}
+                {isRealtime && <span className="ml-1 text-success">• live place</span>}
               </p>
             </div>
             <div className="flex-shrink-0 rounded-xl bg-primary/10 text-primary px-2.5 py-1 text-sm font-bold">

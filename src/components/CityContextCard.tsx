@@ -1,9 +1,11 @@
-import { cityContext } from "@/data/mock";
-import { MapPin, Clock, TrendingDown } from "lucide-react";
+import { MapPin, Clock, Radio } from "lucide-react";
 import { useLocale } from "@/context/LocaleContext";
+import { useCityWeather } from "@/hooks/useCityWeather";
 
 export const CityContextCard = () => {
   const locale = useLocale();
+  const weather = useCityWeather();
+
   return (
   <div className="rounded-2xl bg-card border border-border shadow-elev-sm p-4">
     <div className="flex items-center justify-between">
@@ -14,23 +16,28 @@ export const CityContextCard = () => {
         </span>
         <p className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Live City Context</p>
       </div>
-      <p className="text-[11px] text-muted-foreground font-medium">{cityContext.time}</p>
+      <p className="text-[11px] text-muted-foreground font-medium">
+        {weather.isLoading ? "Updating..." : weather.time}
+      </p>
     </div>
 
     <div className="mt-3 flex items-center gap-3">
-      <div className="text-3xl">{cityContext.weatherEmoji}</div>
+      <div className="text-3xl">{weather.weatherEmoji}</div>
       <div className="flex-1">
         <p className="font-display font-bold text-base text-foreground">
-          {cityContext.weather}, {cityContext.tempC}°C
+          {weather.weather}, {weather.tempC}°C
         </p>
-        <p className="text-xs text-muted-foreground">{cityContext.dayLabel}</p>
+        <p className="text-xs text-muted-foreground">
+          {weather.dayLabel}
+          {weather.isRealtime ? " · live weather" : " · demo weather"}
+        </p>
       </div>
     </div>
 
     <div className="mt-3 grid grid-cols-3 gap-2 pt-3 border-t border-border">
       <Stat icon={<MapPin className="h-3.5 w-3.5" />} label="District" value={locale.district} />
-      <Stat icon={<Clock className="h-3.5 w-3.5" />} label="Period" value="Afternoon" />
-      <Stat icon={<TrendingDown className="h-3.5 w-3.5" />} label="Demand" value={cityContext.demandLevel} />
+      <Stat icon={<Clock className="h-3.5 w-3.5" />} label="Period" value={weather.period} />
+      <Stat icon={<Radio className="h-3.5 w-3.5" />} label="Source" value={weather.isRealtime ? "Live" : "Demo"} />
     </div>
   </div>
   );

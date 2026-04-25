@@ -85,7 +85,7 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     const formatPrice = (eur: number, opts?: { withSymbol?: boolean }) => {
       const v = convert(eur);
       const fractionDigits = currency === "JPY" ? 0 : 2;
-      const num = v.toLocaleString(undefined, {
+      const num = v.toLocaleString("en-US", {
         minimumFractionDigits: fractionDigits,
         maximumFractionDigits: fractionDigits,
       });

@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { useLocalizedOffers } from "@/hooks/useLocalizedOffers";
 
 const Index = () => {
-  const offers = useLocalizedOffers();
+  const { offers, isLoading, isRealtime } = useLocalizedOffers();
   const bestOffer = offers[0];
   return (
     <MobileShell>
@@ -53,7 +53,9 @@ const Index = () => {
             <Sparkles className="h-4 w-4 text-primary" />
             <h2 className="font-display font-bold text-[15px] text-foreground">Best offer near you</h2>
           </div>
-          <Link to="/offers" className="text-xs font-semibold text-primary">See all</Link>
+          <Link to="/offers" className="text-xs font-semibold text-primary">
+            {isLoading ? "Finding..." : isRealtime ? "Live places" : "See all"}
+          </Link>
         </div>
         <OfferCard offer={bestOffer} />
       </section>
