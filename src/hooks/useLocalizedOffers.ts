@@ -4,10 +4,15 @@ import { useLocale } from "@/context/LocaleContext";
 import { buildLocalOffers } from "@/lib/localOffers";
 import { cityCenter, offers as fallbackOffers } from "@/data/mock";
 import { buildOffersFromPlaces, fetchNearbyPlaces } from "@/lib/places";
+import { generateContextAwareOffers } from "@/lib/offerEngine";
+import { useCityWeather } from "@/hooks/useCityWeather";
+import { useLocalEvents } from "@/hooks/useLocalEvents";
 
 /** Returns offers built from real nearby OSM places, with demo offers as fallback. */
 export const useLocalizedOffers = () => {
   const locale = useLocale();
+  const weather = useCityWeather();
+  const events = useLocalEvents();
   const nearbyQuery = useQuery({
     queryKey: ["nearby-places", locale.geo?.lat, locale.geo?.lng],
     queryFn: () => fetchNearbyPlaces(locale.geo!),
@@ -29,9 +34,21 @@ export const useLocalizedOffers = () => {
     return buildOffersFromPlaces(locale.geo, nearbyQuery.data, locale.district);
   }, [locale.geo, locale.district, nearbyQuery.data]);
 
+  const generatedOffers = useMemo(
+    () =>
+      generateContextAwareOffers(realtimeOffers ?? fallback, {
+        district: locale.district,
+        eventSignal: events.signal,
+        weather,
+        source: realtimeOffers ? "realtime" : "demo",
+      }),
+    [events.signal, fallback, locale.district, realtimeOffers, weather]
+  );
+
   return {
-    offers: realtimeOffers ?? fallback,
+    offers: generatedOffers,
     isLoading: nearbyQuery.isLoading,
+    eventSignal: events.signal,
     isRealtime: Boolean(realtimeOffers),
     error: nearbyQuery.error,
   };

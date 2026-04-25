@@ -33,6 +33,17 @@ export const OfferCard = ({ offer, compact = false }: { offer: Offer; compact?: 
             </div>
           </div>
 
+          {offer.scoreLabel && (
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-success">
+                {offer.scoreLabel}
+              </span>
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                AI generated {offer.generatedAt ? `at ${offer.generatedAt}` : ""}
+              </span>
+            </div>
+          )}
+
           {!compact && (
             <p className="text-xs text-muted-foreground mt-1.5 line-clamp-1">{offer.subtitle}</p>
           )}

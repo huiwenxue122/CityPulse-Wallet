@@ -1,13 +1,17 @@
 import { MobileShell } from "@/components/MobileShell";
-import { activity, merchantAnalytics } from "@/data/mock";
+import { merchantAnalytics } from "@/data/mock";
 import { ArrowDown, ArrowUp, Sparkles, TrendingUp, Receipt, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useLocale } from "@/context/LocaleContext";
+import { useActivity } from "@/context/ActivityContext";
 
 const Activity = () => {
   const [tab, setTab] = useState<"wallet" | "analytics">("wallet");
   const locale = useLocale();
+  const { items } = useActivity();
+  const redeemedItems = items.filter((item) => item.type === "redeemed");
+  const incrementalRevenue = redeemedItems.reduce((sum, item) => sum + Math.abs(item.amount), 0);
   return (
     <MobileShell>
       <header className="px-5 pt-12 pb-3">
@@ -34,7 +38,7 @@ const Activity = () => {
 
       {tab === "wallet" ? (
         <section className="mt-5 px-5 space-y-2">
-          {activity.map(a => (
+          {items.map(a => (
             <div key={a.id} className="flex items-center gap-3 p-3 rounded-2xl bg-card border border-border">
               <div className={cn(
                 "h-11 w-11 rounded-xl grid place-items-center text-lg flex-shrink-0",
@@ -65,8 +69,8 @@ const Activity = () => {
           <div className="grid grid-cols-2 gap-3">
             <KPI icon={<Sparkles className="h-4 w-4" />} label="Offers generated" value={merchantAnalytics.offersGenerated.toString()} trend="+12%" />
             <KPI icon={<Target className="h-4 w-4" />} label="Conversion" value={`${merchantAnalytics.conversionRate}%`} trend="+3.4pp" />
-            <KPI icon={<Receipt className="h-4 w-4" />} label="Redemptions" value={merchantAnalytics.redemptions.toString()} trend="+8" />
-            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Revenue" value={locale.formatPrice(merchantAnalytics.incrementalRevenue)} trend={`+${locale.formatPrice(240)}`} />
+            <KPI icon={<Receipt className="h-4 w-4" />} label="Redemptions" value={(merchantAnalytics.redemptions + redeemedItems.length).toString()} trend="+live" />
+            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Revenue" value={locale.formatPrice(merchantAnalytics.incrementalRevenue + incrementalRevenue)} trend={`+${locale.formatPrice(incrementalRevenue)}`} />
           </div>
 
           <div className="rounded-2xl bg-card border border-border p-4">

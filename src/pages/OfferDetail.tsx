@@ -52,6 +52,8 @@ const OfferDetail = () => {
         <div className="mt-4 grid grid-cols-2 gap-2 pt-4 border-t border-border">
           <Info icon={<MapPin className="h-3.5 w-3.5" />} label="Distance" value={`${formatDistance(offer.distanceM)} away`} />
           <Info icon={<Clock className="h-3.5 w-3.5 text-warning" />} label="Expires" value={`${offer.expiresInMin} min`} />
+          {offer.scoreLabel && <Info icon={<Sparkles className="h-3.5 w-3.5 text-primary" />} label="AI match" value={offer.scoreLabel} />}
+          {offer.validWindow && <Info icon={<Clock className="h-3.5 w-3.5" />} label="Rule window" value={offer.validWindow} />}
         </div>
       </div>
 
@@ -69,8 +71,26 @@ const OfferDetail = () => {
               </li>
             ))}
           </ul>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {offer.signals.map(signal => (
+              <span key={signal} className="rounded-full bg-card px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border border-border">
+                {signal}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
+
+      {(offer.merchantGoal || offer.localEvent || offer.demandPattern) && (
+        <section className="px-5 mt-5">
+          <h3 className="font-display font-bold text-[15px] text-foreground mb-2">AI generation logic</h3>
+          <div className="rounded-2xl bg-card border border-border p-4 space-y-2">
+            {offer.merchantGoal && <Info icon={<Sparkles className="h-3.5 w-3.5 text-primary" />} label="Merchant goal" value={offer.merchantGoal} />}
+            {offer.demandPattern && <Info icon={<Clock className="h-3.5 w-3.5 text-warning" />} label="Demand" value={offer.demandPattern} />}
+            {offer.localEvent && <Info icon={<MapPin className="h-3.5 w-3.5" />} label="Event signal" value={offer.localEvent} />}
+          </div>
+        </section>
+      )}
 
       <section className="px-5 mt-5">
         <h3 className="font-display font-bold text-[15px] text-foreground mb-2">Merchant</h3>

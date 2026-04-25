@@ -4,20 +4,31 @@ import { merchantAnalytics } from "@/data/mock";
 import { Sparkles, Target, Clock, Tag, MapPin, Palette, ArrowLeft, TrendingUp, Receipt, Eye, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/context/LocaleContext";
+import { getDemandPattern, getLocalEventSignal, merchantRules } from "@/lib/offerEngine";
+import { useCityWeather } from "@/hooks/useCityWeather";
+import { useActivity } from "@/context/ActivityContext";
+import { useLocalEvents } from "@/hooks/useLocalEvents";
 
 const goals = ["Increase afternoon foot traffic", "Sell slow inventory", "Attract new customers", "Boost weekday lunch"];
 const tones = ["Cozy & local", "Student-friendly", "Premium", "Playful"];
-const inventories = ["Pastries", "Coffee drinks", "Sandwiches", "Books"];
+const inventories = ["Coffee + pastry", "Fresh pastry box", "Warm lunch combo", "Pastries", "Coffee drinks", "Sandwiches", "Books"];
 
 const Merchant = () => {
   const locale = useLocale();
-  const [goal, setGoal] = useState(goals[0]);
-  const [maxDiscount, setMaxDiscount] = useState(20);
-  const [slowFrom, setSlowFrom] = useState(14);
-  const [slowTo, setSlowTo] = useState(17);
-  const [inventory, setInventory] = useState(inventories[0]);
-  const [radius, setRadius] = useState(800);
-  const [tone, setTone] = useState(tones[0]);
+  const weather = useCityWeather();
+  const events = useLocalEvents();
+  const { items } = useActivity();
+  const activeRule = merchantRules[0];
+  const [goal, setGoal] = useState(activeRule.goal);
+  const [maxDiscount, setMaxDiscount] = useState(activeRule.maxDiscount);
+  const [slowFrom, setSlowFrom] = useState(activeRule.slowWindow.from);
+  const [slowTo, setSlowTo] = useState(activeRule.slowWindow.to);
+  const [inventory, setInventory] = useState(activeRule.inventoryFocus);
+  const [radius, setRadius] = useState(activeRule.radiusM);
+  const [tone, setTone] = useState<string>(activeRule.tone);
+  const liveDemand = getDemandPattern(new Date(), weather);
+  const liveEvent = getLocalEventSignal(new Date(), locale.district, events.signal);
+  const recentRedemptions = items.filter((item) => item.type === "redeemed").slice(0, 3);
 
   const preview = useMemo(() => {
     const titles: Record<string, string> = {
@@ -40,9 +51,10 @@ const Merchant = () => {
         goal.toLowerCase().includes("afternoon") ? "Demand drops between 14–17:00" : "Targeting your stated goal",
         `Pushed to wallets within ${radius}m`,
         `Tone matched: ${tone.toLowerCase()}`,
+        `${weather.weather}, ${weather.tempC}C`,
       ],
     };
-  }, [goal, maxDiscount, slowFrom, slowTo, inventory, radius, tone]);
+  }, [goal, maxDiscount, slowFrom, slowTo, inventory, radius, tone, weather]);
 
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -84,6 +96,18 @@ const Merchant = () => {
                 <p className="text-xs text-muted-foreground">AI generates the actual offer. You set the guardrails.</p>
               </div>
               <button className="text-xs font-semibold text-primary flex items-center gap-1"><RefreshCw className="h-3 w-3" /> Reset</button>
+            </div>
+
+            <div className="mb-5 rounded-2xl bg-primary/5 border border-primary/15 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">Live signal stack feeding the AI</p>
+              <div className="mt-2 grid md:grid-cols-3 gap-2 text-xs">
+                <Signal label="Weather" value={`${weather.weather}, ${weather.tempC}C`} />
+                <Signal label="Demand" value={liveDemand.label} />
+                <Signal
+                  label={`Local event · ${events.isRealtime ? "OSM" : "pattern"}`}
+                  value={liveEvent}
+                />
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-5">
@@ -148,6 +172,22 @@ const Merchant = () => {
               <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-primary" />Redemptions</span>
             </div>
           </div>
+
+          <div className="rounded-3xl bg-card border border-border shadow-elev-sm p-6">
+            <h2 className="font-display font-bold text-lg text-foreground mb-1">Live redemption feed</h2>
+            <p className="text-xs text-muted-foreground mb-4">Simulated checkouts appear here as customers redeem generated offers.</p>
+            <div className="space-y-2">
+              {recentRedemptions.map((item) => (
+                <div key={item.id} className="flex items-center justify-between gap-3 rounded-2xl bg-secondary/60 p-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{item.merchant}</p>
+                    <p className="text-xs text-muted-foreground truncate">{item.label} · {item.time}</p>
+                  </div>
+                  <span className="text-sm font-bold text-success">{locale.formatPrice(Math.abs(item.amount))}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Right: Live Preview */}
@@ -195,6 +235,8 @@ const Merchant = () => {
               <Row label="Goal" value={goal} />
               <Row label="Window" value={preview.window} />
               <Row label="Tone" value={tone} />
+              <Row label="Demand signal" value={liveDemand.level} />
+              <Row label="Event source" value={events.isRealtime ? "OpenStreetMap venue signals" : "Time pattern fallback"} />
             </div>
 
             <button className="mt-5 w-full rounded-2xl bg-primary text-primary-foreground py-3 font-display font-bold text-sm hover:bg-primary-deep transition-base">
@@ -250,6 +292,13 @@ const Row = ({ label, value }: { label: string; value: string }) => (
   <div className="flex items-center justify-between gap-2">
     <span className="text-muted-foreground">{label}</span>
     <span className="font-semibold text-foreground truncate">{value}</span>
+  </div>
+);
+
+const Signal = ({ label, value }: { label: string; value: string }) => (
+  <div className="rounded-xl bg-card border border-border p-3">
+    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+    <p className="mt-1 font-semibold text-foreground line-clamp-2">{value}</p>
   </div>
 );
 

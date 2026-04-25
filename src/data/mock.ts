@@ -18,6 +18,14 @@ export type Offer = {
   address: string;
   coords: { x: number; y: number };
   geo: { lat: number; lng: number };
+  score?: number;
+  scoreLabel?: string;
+  merchantGoal?: string;
+  demandPattern?: string;
+  localEvent?: string;
+  validWindow?: string;
+  generatedAt?: string;
+  source?: "demo" | "realtime";
 };
 
 // Bounding box used to map lat/lng → SVG percentage coords on the stylized map.

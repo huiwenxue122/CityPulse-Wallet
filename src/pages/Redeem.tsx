@@ -6,15 +6,21 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useLocalizedOffer } from "@/hooks/useLocalizedOffers";
 import { useLocale } from "@/context/LocaleContext";
+import { useActivity } from "@/context/ActivityContext";
 
 const Redeem = () => {
   const { id } = useParams();
   const offer = useLocalizedOffer(id);
   const locale = useLocale();
+  const { addRedemption } = useActivity();
   const merchantTpl = merchants.find(m => m.id === offer.merchantId);
   const merchant = { ...merchantTpl, name: offer.merchant };
   const [shown, setShown] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setShown(true), 50); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    addRedemption(offer);
+    const t = setTimeout(() => setShown(true), 50);
+    return () => clearTimeout(t);
+  }, [addRedemption, offer]);
 
   const code = "SC-" + (offer.id.toUpperCase().replace("-", "")) + "-9X4K";
 
@@ -46,6 +52,7 @@ const Redeem = () => {
         <div className="mt-5 pt-5 border-t border-dashed border-border space-y-2.5">
           <Row label="Offer" value={offer.title} />
           <Row label="Merchant" value={merchant.name} />
+          <Row label="AI match" value={offer.scoreLabel ?? "Generated offer"} />
           <Row label="Original" value={locale.formatPrice(offer.originalPrice)} muted strike />
           <Row label={`Discount (${offer.discount}%)`} value={`− ${locale.formatPrice(offer.originalPrice - offer.finalPrice)}`} accent />
           <div className="pt-2.5 mt-2.5 border-t border-border flex items-center justify-between">

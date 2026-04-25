@@ -1,10 +1,12 @@
 import { MapPin, Clock, Radio } from "lucide-react";
 import { useLocale } from "@/context/LocaleContext";
 import { useCityWeather } from "@/hooks/useCityWeather";
+import { useLocalEvents } from "@/hooks/useLocalEvents";
 
 export const CityContextCard = () => {
   const locale = useLocale();
   const weather = useCityWeather();
+  const events = useLocalEvents();
 
   return (
   <div className="rounded-2xl bg-card border border-border shadow-elev-sm p-4">
@@ -38,6 +40,12 @@ export const CityContextCard = () => {
       <Stat icon={<MapPin className="h-3.5 w-3.5" />} label="District" value={locale.district} />
       <Stat icon={<Clock className="h-3.5 w-3.5" />} label="Period" value={weather.period} />
       <Stat icon={<Radio className="h-3.5 w-3.5" />} label="Source" value={weather.isRealtime ? "Live" : "Demo"} />
+    </div>
+    <div className="mt-3 rounded-xl bg-secondary/60 border border-border px-3 py-2">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        Local event signal · {events.isRealtime ? "OpenStreetMap" : "pattern"}
+      </p>
+      <p className="mt-0.5 text-xs font-semibold text-foreground line-clamp-2">{events.signal.label}</p>
     </div>
   </div>
   );
