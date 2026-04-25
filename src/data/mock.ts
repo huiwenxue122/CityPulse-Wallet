@@ -17,7 +17,19 @@ export type Offer = {
   finalPrice: number;
   address: string;
   coords: { x: number; y: number };
+  geo: { lat: number; lng: number };
 };
+
+// Bounding box used to map lat/lng → SVG percentage coords on the stylized map.
+// Roughly covers Berlin Mitte.
+export const mapBounds = {
+  minLat: 52.515,
+  maxLat: 52.534,
+  minLng: 13.385,
+  maxLng: 13.420,
+};
+
+export const cityCenter = { lat: 52.5244, lng: 13.4025 }; // Berlin Mitte fallback
 
 export const cityContext = {
   district: "Berlin Mitte",
