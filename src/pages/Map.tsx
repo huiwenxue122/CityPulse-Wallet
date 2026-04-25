@@ -8,8 +8,8 @@ import {
   buildLocalOffers,
   buildLocalBounds,
   projectToPct,
-  reverseGeocode,
 } from "@/lib/localOffers";
+import { useLocale } from "@/context/LocaleContext";
 import { toast } from "sonner";
 
 type GeoState =
@@ -19,8 +19,8 @@ type GeoState =
   | { status: "denied" | "error"; message: string };
 
 const Map = () => {
+  const locale = useLocale();
   const [geo, setGeo] = useState<GeoState>({ status: "idle" });
-  const [place, setPlace] = useState<{ district: string; city: string } | null>(null);
   const [selectedId, setSelectedId] = useState<string>(fallbackOffers[0].id);
 
   const requestLocation = () => {
@@ -34,6 +34,7 @@ const Map = () => {
       (pos) => {
         const { latitude, longitude, accuracy } = pos.coords;
         setGeo({ status: "ready", lat: latitude, lng: longitude, accuracy });
+        locale.setGeo({ lat: latitude, lng: longitude });
         toast.success(`Location locked · ±${Math.round(accuracy)}m`);
       },
       (err) => {
@@ -53,24 +54,16 @@ const Map = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reverse-geocode whenever we get a fresh fix
-  useEffect(() => {
-    if (geo.status !== "ready") return;
-    let cancelled = false;
-    reverseGeocode(geo.lat, geo.lng).then((p) => {
-      if (!cancelled && p) setPlace({ district: p.district, city: p.city });
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [geo]);
-
   const userGeo = useMemo(() => {
     if (geo.status === "ready") return { lat: geo.lat, lng: geo.lng };
+    if (locale.geo) return locale.geo;
     return cityCenter;
-  }, [geo]);
+  }, [geo, locale.geo]);
 
-  const localOffers = useMemo(() => buildLocalOffers(userGeo), [userGeo]);
+  const localOffers = useMemo(
+    () => buildLocalOffers(userGeo, locale.district),
+    [userGeo, locale.district]
+  );
   const bounds = useMemo(() => buildLocalBounds(userGeo), [userGeo]);
   const userPct = useMemo(
     () => projectToPct(bounds, userGeo.lat, userGeo.lng),
