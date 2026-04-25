@@ -1,5 +1,6 @@
 import { cityContext } from "@/data/mock";
 import { MapPin, Clock, TrendingDown } from "lucide-react";
+import { useLocale } from "@/context/LocaleContext";
 
 export const CityContextCard = () => (
   <div className="rounded-2xl bg-card border border-border shadow-elev-sm p-4">
