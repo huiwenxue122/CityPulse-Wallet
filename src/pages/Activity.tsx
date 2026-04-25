@@ -93,7 +93,7 @@ const Activity = () => {
           <div className="rounded-2xl bg-gradient-card text-primary-foreground p-4 shadow-card-premium relative overflow-hidden">
             <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
             <p className="text-[11px] uppercase tracking-wider opacity-90 font-semibold relative">Estimated incremental revenue</p>
-            <p className="font-display font-extrabold text-3xl mt-1 relative">€ {merchantAnalytics.incrementalRevenue.toLocaleString()}</p>
+            <p className="font-display font-extrabold text-3xl mt-1 relative">{locale.formatPrice(merchantAnalytics.incrementalRevenue)}</p>
             <p className="text-xs opacity-90 mt-1 relative">attributable to AI-targeted offers this month</p>
           </div>
         </section>
