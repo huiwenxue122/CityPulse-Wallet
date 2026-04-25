@@ -3,9 +3,11 @@ import { activity, merchantAnalytics } from "@/data/mock";
 import { ArrowDown, ArrowUp, Sparkles, TrendingUp, Receipt, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useLocale } from "@/context/LocaleContext";
 
 const Activity = () => {
   const [tab, setTab] = useState<"wallet" | "analytics">("wallet");
+  const locale = useLocale();
   return (
     <MobileShell>
       <header className="px-5 pt-12 pb-3">
