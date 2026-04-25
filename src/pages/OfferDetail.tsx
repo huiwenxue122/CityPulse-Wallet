@@ -34,8 +34,8 @@ const OfferDetail = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground font-medium">Your price</p>
-            <p className="font-display font-extrabold text-3xl text-foreground">€ {offer.finalPrice.toFixed(2)}</p>
-            <p className="text-xs text-muted-foreground line-through">€ {offer.originalPrice.toFixed(2)}</p>
+            <p className="font-display font-extrabold text-3xl text-foreground">{locale.formatPrice(offer.finalPrice)}</p>
+            <p className="text-xs text-muted-foreground line-through">{locale.formatPrice(offer.originalPrice)}</p>
           </div>
           <div className="rounded-xl bg-primary/10 text-primary px-3 py-2 text-center">
             <p className="font-display font-extrabold text-2xl leading-none">-{offer.discount}%</p>
