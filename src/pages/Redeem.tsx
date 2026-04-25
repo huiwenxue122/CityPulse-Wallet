@@ -1,14 +1,18 @@
 import { MobileShell } from "@/components/MobileShell";
-import { offers, merchants, user } from "@/data/mock";
+import { merchants, user } from "@/data/mock";
 import { Link, useParams } from "react-router-dom";
 import { CheckCircle2, Wallet, Receipt, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { useLocalizedOffer } from "@/hooks/useLocalizedOffers";
+import { useLocale } from "@/context/LocaleContext";
 
 const Redeem = () => {
   const { id } = useParams();
-  const offer = offers.find(o => o.id === id) ?? offers[0];
-  const merchant = merchants.find(m => m.id === offer.merchantId)!;
+  const offer = useLocalizedOffer(id);
+  const locale = useLocale();
+  const merchantTpl = merchants.find(m => m.id === offer.merchantId)!;
+  const merchant = { ...merchantTpl, name: offer.merchant };
   const [shown, setShown] = useState(false);
   useEffect(() => { const t = setTimeout(() => setShown(true), 50); return () => clearTimeout(t); }, []);
 
