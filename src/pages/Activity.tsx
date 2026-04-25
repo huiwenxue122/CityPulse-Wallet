@@ -51,7 +51,7 @@ const Activity = () => {
                   a.amount > 0 ? "text-success" : "text-foreground"
                 )}>
                   {a.amount > 0 ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-                  €{Math.abs(a.amount).toFixed(2)}
+                  {locale.formatPrice(Math.abs(a.amount))}
                 </p>
               )}
               {a.amount === 0 && (
