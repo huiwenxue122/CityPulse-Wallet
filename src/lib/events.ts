@@ -1,15 +1,89 @@
 export type LocalEventSignal = {
   label: string;
-  source: "openstreetmap" | "pattern";
+  source: "ticketmaster" | "openstreetmap" | "pattern";
   nearbyCount: number;
+  eventName?: string;
   venueName?: string;
   venueType?: string;
+  startsAt?: string;
 };
 
 type OverpassEventElement = {
   type: string;
   id: number;
   tags?: Record<string, string>;
+};
+
+type TicketmasterEvent = {
+  name?: string;
+  dates?: {
+    start?: {
+      localDate?: string;
+      localTime?: string;
+      dateTime?: string;
+    };
+  };
+  _embedded?: {
+    venues?: Array<{
+      name?: string;
+    }>;
+  };
+};
+
+const ticketmasterKey = import.meta.env.VITE_TICKETMASTER_API_KEY as string | undefined;
+
+const formatTicketmasterStart = (event: TicketmasterEvent) => {
+  const start = event.dates?.start;
+  if (!start) return undefined;
+  if (start.localDate && start.localTime) return `${start.localDate} ${start.localTime.slice(0, 5)}`;
+  if (start.localDate) return start.localDate;
+  if (start.dateTime) {
+    return new Date(start.dateTime).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  return undefined;
+};
+
+const fetchTicketmasterSignal = async (
+  user: { lat: number; lng: number },
+  radiusM: number
+): Promise<LocalEventSignal | null> => {
+  if (!ticketmasterKey) return null;
+
+  const params = new URLSearchParams({
+    apikey: ticketmasterKey,
+    latlong: `${user.lat},${user.lng}`,
+    radius: String(Math.max(1, Math.round(radiusM / 1000))),
+    unit: "km",
+    sort: "date,asc",
+    size: "5",
+  });
+
+  const res = await fetch(`https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`);
+  if (!res.ok) return null;
+
+  const data: { _embedded?: { events?: TicketmasterEvent[] }; page?: { totalElements?: number } } = await res.json();
+  const events = data._embedded?.events ?? [];
+  const first = events[0];
+
+  if (!first?.name) return null;
+
+  const venueName = first._embedded?.venues?.[0]?.name;
+  const startsAt = formatTicketmasterStart(first);
+
+  return {
+    label: `${data.page?.totalElements ?? events.length} scheduled events nearby, next: ${first.name}`,
+    source: "ticketmaster",
+    nearbyCount: data.page?.totalElements ?? events.length,
+    eventName: first.name,
+    venueName,
+    venueType: "scheduled event",
+    startsAt,
+  };
 };
 
 const typeFromTags = (tags: Record<string, string>) => {
@@ -45,6 +119,9 @@ export const fetchLocalEventSignals = async (
   district: string,
   radiusM = 2500
 ): Promise<LocalEventSignal> => {
+  const ticketmasterSignal = await fetchTicketmasterSignal(user, radiusM);
+  if (ticketmasterSignal) return ticketmasterSignal;
+
   const query = `
     [out:json][timeout:12];
     (

@@ -11,6 +11,12 @@ const periodForHour = (hour: number) => {
   return "Evening";
 };
 
+const eventSourceLabel = (source: string) => {
+  if (source === "ticketmaster") return "Ticketmaster";
+  if (source === "openstreetmap") return "OpenStreetMap";
+  return "pattern";
+};
+
 export const CityContextCard = () => {
   const locale = useLocale();
   const weather = useCityWeather();
@@ -62,7 +68,7 @@ export const CityContextCard = () => {
     </div>
     <div className="mt-3 rounded-xl bg-secondary/60 border border-border px-3 py-2">
       <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-        Local event signal · {events.isRealtime ? "OpenStreetMap" : "pattern"}
+        Local event signal · {eventSourceLabel(events.signal.source)}
       </p>
       <p className="mt-0.5 text-xs font-semibold text-foreground line-clamp-2">{events.signal.label}</p>
     </div>

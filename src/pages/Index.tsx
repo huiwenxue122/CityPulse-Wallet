@@ -61,7 +61,7 @@ const Index = () => {
           <div className="mb-3 rounded-2xl border border-primary/15 bg-primary/5 p-3">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">Why this offer now</p>
             <p className="mt-1 text-xs leading-relaxed text-foreground">
-              {bestOffer.whyNow.slice(0, 3).join(" · ")}
+              {[...bestOffer.whyNow.slice(0, 3), bestOffer.localEvent].filter(Boolean).join(" · ")}
             </p>
           </div>
         )}

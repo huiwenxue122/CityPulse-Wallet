@@ -52,6 +52,12 @@ export const OfferCard = ({ offer, compact = false }: { offer: Offer; compact?: 
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{formatDistance(offer.distanceM)}</span>
             <span className="flex items-center gap-1 text-warning"><Clock className="h-3 w-3" />{fmtCountdown(offer.expiresInMin)}</span>
           </div>
+
+          {offer.localEvent && (
+            <p className="mt-2 text-[11px] font-medium text-primary line-clamp-1">
+              Event signal: {offer.localEvent}
+            </p>
+          )}
         </div>
       </div>
 

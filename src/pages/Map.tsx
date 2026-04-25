@@ -376,6 +376,11 @@ const Map = () => {
                 {selected.expiresInMin}m left
                 {isRealtime && <span className="ml-1 text-success">• live place</span>}
               </p>
+              {selected.localEvent && (
+                <p className="text-[11px] text-primary font-medium mt-1 line-clamp-1">
+                  Event: {selected.localEvent}
+                </p>
+              )}
             </div>
             <div className="flex-shrink-0 rounded-xl bg-primary/10 text-primary px-2.5 py-1 text-sm font-bold">
               -{selected.discount}%

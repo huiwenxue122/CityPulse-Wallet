@@ -13,6 +13,12 @@ const goals = ["Increase afternoon foot traffic", "Sell slow inventory", "Attrac
 const tones = ["Cozy & local", "Student-friendly", "Premium", "Playful"];
 const inventories = ["Coffee + pastry", "Fresh pastry box", "Warm lunch combo", "Pastries", "Coffee drinks", "Sandwiches", "Books"];
 
+const eventSourceLabel = (source: string) => {
+  if (source === "ticketmaster") return "Ticketmaster scheduled events";
+  if (source === "openstreetmap") return "OpenStreetMap venue signals";
+  return "Time pattern fallback";
+};
+
 const Merchant = () => {
   const locale = useLocale();
   const weather = useCityWeather();
@@ -104,7 +110,7 @@ const Merchant = () => {
                 <Signal label="Weather" value={`${weather.weather}, ${weather.tempC}C`} />
                 <Signal label="Demand" value={liveDemand.label} />
                 <Signal
-                  label={`Local event · ${events.isRealtime ? "OSM" : "pattern"}`}
+                  label={`Local event · ${events.signal.source === "ticketmaster" ? "Ticketmaster" : events.isRealtime ? "OSM" : "pattern"}`}
                   value={liveEvent}
                 />
               </div>
@@ -236,7 +242,7 @@ const Merchant = () => {
               <Row label="Window" value={preview.window} />
               <Row label="Tone" value={tone} />
               <Row label="Demand signal" value={liveDemand.level} />
-              <Row label="Event source" value={events.isRealtime ? "OpenStreetMap venue signals" : "Time pattern fallback"} />
+              <Row label="Event source" value={eventSourceLabel(events.signal.source)} />
             </div>
 
             <button className="mt-5 w-full rounded-2xl bg-primary text-primary-foreground py-3 font-display font-bold text-sm hover:bg-primary-deep transition-base">

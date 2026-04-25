@@ -18,7 +18,7 @@ export const useLocalEvents = () => {
   return {
     signal: query.data ?? fallback,
     isLoading: query.isLoading,
-    isRealtime: query.data?.source === "openstreetmap",
+    isRealtime: query.data?.source === "ticketmaster" || query.data?.source === "openstreetmap",
     error: query.error,
   };
 };
