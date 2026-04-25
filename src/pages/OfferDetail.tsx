@@ -1,14 +1,18 @@
 import { MobileShell } from "@/components/MobileShell";
-import { offers, merchants } from "@/data/mock";
+import { merchants } from "@/data/mock";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ChevronLeft, MapPin, Clock, Sparkles, ShieldCheck, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocalizedOffer } from "@/hooks/useLocalizedOffers";
+import { useLocale } from "@/context/LocaleContext";
 
 const OfferDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const offer = offers.find(o => o.id === id) ?? offers[0];
-  const merchant = merchants.find(m => m.id === offer.merchantId)!;
+  const offer = useLocalizedOffer(id);
+  const locale = useLocale();
+  const merchantTpl = merchants.find(m => m.id === offer.merchantId)!;
+  const merchant = { ...merchantTpl, name: offer.merchant, address: offer.address };
 
   return (
     <MobileShell hideNav>
