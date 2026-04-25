@@ -161,11 +161,11 @@ const Map = () => {
             <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground leading-tight truncate">
-                {place?.district ?? (isLive ? "Locating area…" : "Berlin Mitte")}
+                {locale.district}
               </p>
               <p className="text-[10px] text-muted-foreground leading-tight truncate">
                 {geo.status === "ready" &&
-                  `${place?.city ?? "Live"} · ±${Math.round(geo.accuracy)}m`}
+                  `${locale.city} · ${locale.currency} · ±${Math.round(geo.accuracy)}m`}
                 {geo.status === "loading" && "Locating…"}
                 {geo.status === "denied" && "Location off — demo mode"}
                 {geo.status === "error" && "Location unavailable — demo mode"}
