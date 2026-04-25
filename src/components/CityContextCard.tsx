@@ -28,12 +28,13 @@ export const CityContextCard = () => {
     </div>
 
     <div className="mt-3 grid grid-cols-3 gap-2 pt-3 border-t border-border">
-      <Stat icon={<MapPin className="h-3.5 w-3.5" />} label="District" value={cityContext.district.replace("Berlin ", "")} />
+      <Stat icon={<MapPin className="h-3.5 w-3.5" />} label="District" value={locale.district} />
       <Stat icon={<Clock className="h-3.5 w-3.5" />} label="Period" value="Afternoon" />
       <Stat icon={<TrendingDown className="h-3.5 w-3.5" />} label="Demand" value={cityContext.demandLevel} />
     </div>
   </div>
-);
+  );
+};
 
 const Stat = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
   <div className="flex flex-col gap-0.5">
