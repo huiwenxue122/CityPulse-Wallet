@@ -111,6 +111,7 @@ export const offers: Offer[] = [
     finalPrice: 10.00,
     address: "Alexanderplatz 7",
     coords: { x: 72, y: 55 },
+    geo: { lat: 52.5219, lng: 13.4132 },
   },
   {
     id: "of-4",
