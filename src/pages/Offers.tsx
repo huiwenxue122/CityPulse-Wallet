@@ -1,7 +1,7 @@
 import { MobileShell } from "@/components/MobileShell";
 import { CityContextCard } from "@/components/CityContextCard";
 import { OfferCard } from "@/components/OfferCard";
-import { offers } from "@/data/mock";
+import { useLocalizedOffers } from "@/hooks/useLocalizedOffers";
 import { Sparkles, SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
