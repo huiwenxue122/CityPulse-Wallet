@@ -10,6 +10,7 @@ const tones = ["Cozy & local", "Student-friendly", "Premium", "Playful"];
 const inventories = ["Pastries", "Coffee drinks", "Sandwiches", "Books"];
 
 const Merchant = () => {
+  const locale = useLocale();
   const [goal, setGoal] = useState(goals[0]);
   const [maxDiscount, setMaxDiscount] = useState(20);
   const [slowFrom, setSlowFrom] = useState(14);
