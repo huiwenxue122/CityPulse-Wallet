@@ -46,11 +46,11 @@ const Redeem = () => {
         <div className="mt-5 pt-5 border-t border-dashed border-border space-y-2.5">
           <Row label="Offer" value={offer.title} />
           <Row label="Merchant" value={merchant.name} />
-          <Row label="Original" value={`€ ${offer.originalPrice.toFixed(2)}`} muted strike />
-          <Row label={`Discount (${offer.discount}%)`} value={`− € ${(offer.originalPrice - offer.finalPrice).toFixed(2)}`} accent />
+          <Row label="Original" value={locale.formatPrice(offer.originalPrice)} muted strike />
+          <Row label={`Discount (${offer.discount}%)`} value={`− ${locale.formatPrice(offer.originalPrice - offer.finalPrice)}`} accent />
           <div className="pt-2.5 mt-2.5 border-t border-border flex items-center justify-between">
             <span className="font-display font-bold text-foreground">Total paid</span>
-            <span className="font-display font-extrabold text-lg text-foreground">€ {offer.finalPrice.toFixed(2)}</span>
+            <span className="font-display font-extrabold text-lg text-foreground">{locale.formatPrice(offer.finalPrice)}</span>
           </div>
           <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
             <span className="flex items-center gap-1.5"><Wallet className="h-3.5 w-3.5" /> City Wallet •••• {user.cardLast4}</span>
