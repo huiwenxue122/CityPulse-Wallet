@@ -2,11 +2,30 @@ import { MapPin, Clock, Radio } from "lucide-react";
 import { useLocale } from "@/context/LocaleContext";
 import { useCityWeather } from "@/hooks/useCityWeather";
 import { useLocalEvents } from "@/hooks/useLocalEvents";
+import { useEffect, useMemo, useState } from "react";
+
+const periodForHour = (hour: number) => {
+  if (hour < 6) return "Night";
+  if (hour < 12) return "Morning";
+  if (hour < 18) return "Afternoon";
+  return "Evening";
+};
 
 export const CityContextCard = () => {
   const locale = useLocale();
   const weather = useCityWeather();
   const events = useLocalEvents();
+  const [now, setNow] = useState(() => new Date());
+  const liveTime = useMemo(
+    () => now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+    [now]
+  );
+  const livePeriod = useMemo(() => periodForHour(now.getHours()), [now]);
+
+  useEffect(() => {
+    const tick = window.setInterval(() => setNow(new Date()), 15_000);
+    return () => window.clearInterval(tick);
+  }, []);
 
   return (
   <div className="rounded-2xl bg-card border border-border shadow-elev-sm p-4">
@@ -19,7 +38,7 @@ export const CityContextCard = () => {
         <p className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">Live City Context</p>
       </div>
       <p className="text-[11px] text-muted-foreground font-medium">
-        {weather.isLoading ? "Updating..." : weather.time}
+        {weather.isLoading ? "Updating..." : liveTime}
       </p>
     </div>
 
@@ -38,7 +57,7 @@ export const CityContextCard = () => {
 
     <div className="mt-3 grid grid-cols-3 gap-2 pt-3 border-t border-border">
       <Stat icon={<MapPin className="h-3.5 w-3.5" />} label="District" value={locale.district} />
-      <Stat icon={<Clock className="h-3.5 w-3.5" />} label="Period" value={weather.period} />
+      <Stat icon={<Clock className="h-3.5 w-3.5" />} label="Period" value={livePeriod} />
       <Stat icon={<Radio className="h-3.5 w-3.5" />} label="Source" value={weather.isRealtime ? "Live" : "Demo"} />
     </div>
     <div className="mt-3 rounded-xl bg-secondary/60 border border-border px-3 py-2">

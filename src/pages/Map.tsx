@@ -1,13 +1,15 @@
 import { MobileShell } from "@/components/MobileShell";
 import { offers as fallbackOffers, cityCenter } from "@/data/mock";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Navigation, LocateFixed, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  buildLocalBounds,
-  projectToPct,
-} from "@/lib/localOffers";
 import { useLocale } from "@/context/LocaleContext";
 import { toast } from "sonner";
 import { useLocalizedOffers } from "@/hooks/useLocalizedOffers";
@@ -19,11 +21,104 @@ type GeoState =
   | { status: "ready"; lat: number; lng: number; accuracy: number }
   | { status: "denied" | "error"; message: string };
 
+const TILE_SIZE = 256;
+const DEFAULT_MAP_ZOOM = 16;
+const MIN_MAP_ZOOM = 14;
+const MAX_MAP_ZOOM = 18;
+const MAP_VIEW = { width: 400, height: 600 };
+const TILE_SUBDOMAINS = ["a", "b", "c"];
+
+const latLngToWorldPixel = (
+  geo: { lat: number; lng: number },
+  zoom: number
+) => {
+  const scale = TILE_SIZE * 2 ** zoom;
+  const sinLat = Math.sin((geo.lat * Math.PI) / 180);
+  const x = ((geo.lng + 180) / 360) * scale;
+  const y =
+    (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale;
+  return { x, y };
+};
+
+const worldPixelToLatLng = (
+  pixel: { x: number; y: number },
+  zoom: number
+) => {
+  const scale = TILE_SIZE * 2 ** zoom;
+  const lng = (pixel.x / scale) * 360 - 180;
+  const n = Math.PI - (2 * Math.PI * pixel.y) / scale;
+  const lat = (180 / Math.PI) * Math.atan(Math.sinh(n));
+  return { lat, lng };
+};
+
+const getPointStyle = (
+  center: { lat: number; lng: number },
+  point: { lat: number; lng: number },
+  zoom: number
+) => {
+  const centerPx = latLngToWorldPixel(center, zoom);
+  const pointPx = latLngToWorldPixel(point, zoom);
+  return {
+    left: `${MAP_VIEW.width / 2 + pointPx.x - centerPx.x}px`,
+    top: `${MAP_VIEW.height / 2 + pointPx.y - centerPx.y}px`,
+  };
+};
+
+const buildMapTiles = (center: { lat: number; lng: number }, zoom: number) => {
+  const centerPx = latLngToWorldPixel(center, zoom);
+  const topLeft = {
+    x: centerPx.x - MAP_VIEW.width / 2,
+    y: centerPx.y - MAP_VIEW.height / 2,
+  };
+  const minTileX = Math.floor(topLeft.x / TILE_SIZE);
+  const maxTileX = Math.floor((topLeft.x + MAP_VIEW.width) / TILE_SIZE);
+  const minTileY = Math.floor(topLeft.y / TILE_SIZE);
+  const maxTileY = Math.floor((topLeft.y + MAP_VIEW.height) / TILE_SIZE);
+  const tileCount = 2 ** zoom;
+  const tiles: Array<{
+    key: string;
+    url: string;
+    left: number;
+    top: number;
+  }> = [];
+
+  for (let x = minTileX; x <= maxTileX; x += 1) {
+    for (let y = minTileY; y <= maxTileY; y += 1) {
+      if (y < 0 || y >= tileCount) continue;
+      const wrappedX = ((x % tileCount) + tileCount) % tileCount;
+      const subdomain =
+        TILE_SUBDOMAINS[Math.abs(x + y) % TILE_SUBDOMAINS.length];
+      tiles.push({
+        key: `${x}-${y}`,
+        url: `https://${subdomain}.tile.openstreetmap.org/${zoom}/${wrappedX}/${y}.png`,
+        left: x * TILE_SIZE - topLeft.x,
+        top: y * TILE_SIZE - topLeft.y,
+      });
+    }
+  }
+
+  return tiles;
+};
+
+const clampMapZoom = (zoom: number) =>
+  Math.min(MAX_MAP_ZOOM, Math.max(MIN_MAP_ZOOM, zoom));
+
+const isInteractiveElement = (target: EventTarget | null) =>
+  target instanceof Element && Boolean(target.closest("a, button"));
+
 const Map = () => {
   const locale = useLocale();
   const [geo, setGeo] = useState<GeoState>({ status: "idle" });
   const [selectedId, setSelectedId] = useState<string>(fallbackOffers[0].id);
   const { offers: localOffers, isLoading, isRealtime } = useLocalizedOffers();
+  const [mapZoom, setMapZoom] = useState(DEFAULT_MAP_ZOOM);
+  const [mapCenter, setMapCenter] = useState(cityCenter);
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    centerPx: { x: number; y: number };
+  } | null>(null);
 
   const requestLocation = () => {
     if (!("geolocation" in navigator)) {
@@ -62,51 +157,120 @@ const Map = () => {
     return cityCenter;
   }, [geo, locale.geo]);
 
-  const bounds = useMemo(() => buildLocalBounds(userGeo), [userGeo]);
-  const userPct = useMemo(
-    () => projectToPct(bounds, userGeo.lat, userGeo.lng),
-    [bounds, userGeo]
+  useEffect(() => {
+    setMapCenter(userGeo);
+  }, [userGeo]);
+
+  const mapTiles = useMemo(
+    () => buildMapTiles(mapCenter, mapZoom),
+    [mapCenter, mapZoom]
+  );
+  const userPointStyle = useMemo(
+    () => getPointStyle(mapCenter, userGeo, mapZoom),
+    [mapCenter, mapZoom, userGeo]
   );
 
   const selected =
     localOffers.find((o) => o.id === selectedId) ?? localOffers[0];
   const isLive = geo.status === "ready" && isRealtime;
+  const zoomIn = () => setMapZoom((zoom) => clampMapZoom(zoom + 1));
+  const zoomOut = () => setMapZoom((zoom) => clampMapZoom(zoom - 1));
+  const recenterMap = () => setMapCenter(userGeo);
+  const handleMapPointerDown = (
+    event: ReactPointerEvent<HTMLDivElement>
+  ) => {
+    if (isInteractiveElement(event.target)) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      centerPx: latLngToWorldPixel(mapCenter, mapZoom),
+    };
+  };
+  const handleMapPointerMove = (
+    event: ReactPointerEvent<HTMLDivElement>
+  ) => {
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+    setMapCenter(
+      worldPixelToLatLng(
+        { x: drag.centerPx.x - dx, y: drag.centerPx.y - dy },
+        mapZoom
+      )
+    );
+  };
+  const handleMapPointerUp = (
+    event: ReactPointerEvent<HTMLDivElement>
+  ) => {
+    if (dragRef.current?.pointerId !== event.pointerId) return;
+    dragRef.current = null;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+  };
 
   return (
     <MobileShell>
       <div className="relative h-[60vh] bg-secondary overflow-hidden">
-        <div className="absolute inset-0">
-          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice">
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="hsl(220 16% 88%)" strokeWidth="0.5" />
-              </pattern>
-              <radialGradient id="userHalo" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.18" />
-                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
-              </radialGradient>
-            </defs>
-            <rect width="400" height="600" fill="hsl(220 20% 96%)" />
-            <rect width="400" height="600" fill="url(#grid)" />
-            {/* Decorative roads */}
-            <path d="M 0 250 L 400 220" stroke="white" strokeWidth="14" />
-            <path d="M 220 0 L 200 600" stroke="white" strokeWidth="14" />
-            <path d="M 0 480 L 400 500" stroke="white" strokeWidth="10" />
-            {/* Decorative parks */}
-            <circle cx="120" cy="480" r="55" fill="hsl(140 40% 82%)" />
-            <rect x="280" y="60" width="90" height="70" rx="8" fill="hsl(140 40% 82%)" />
-            {/* User halo */}
-            <circle
-              cx={(userPct.x / 100) * 400}
-              cy={(userPct.y / 100) * 600}
-              r="90"
-              fill="url(#userHalo)"
+        <div
+          className="absolute left-1/2 top-1/2 h-[600px] w-[400px] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[#e5e3df]"
+          aria-label="Real street map"
+          onPointerDown={handleMapPointerDown}
+          onPointerMove={handleMapPointerMove}
+          onPointerUp={handleMapPointerUp}
+          onPointerCancel={handleMapPointerUp}
+          style={{ touchAction: "none" }}
+        >
+          {mapTiles.map((tile) => (
+            <img
+              key={tile.key}
+              src={tile.url}
+              alt=""
+              draggable={false}
+              className="absolute h-64 w-64 select-none"
+              style={{ left: tile.left, top: tile.top }}
             />
-          </svg>
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-transparent to-background/20 pointer-events-none" />
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noreferrer"
+            className="absolute bottom-1 right-1 rounded bg-white/85 px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground shadow-sm"
+          >
+            © OSM
+          </a>
+          <div className="absolute right-3 top-28 z-30 overflow-hidden rounded-2xl border border-border bg-card/95 shadow-elev-md backdrop-blur">
+            <button
+              onClick={zoomIn}
+              disabled={mapZoom >= MAX_MAP_ZOOM}
+              className="grid h-10 w-10 place-items-center text-lg font-bold text-foreground disabled:opacity-40"
+              aria-label="Zoom in"
+            >
+              +
+            </button>
+            <div className="h-px bg-border" />
+            <button
+              onClick={zoomOut}
+              disabled={mapZoom <= MIN_MAP_ZOOM}
+              className="grid h-10 w-10 place-items-center text-xl font-bold text-foreground disabled:opacity-40"
+              aria-label="Zoom out"
+            >
+              -
+            </button>
+          </div>
+          <button
+            onClick={recenterMap}
+            className="absolute bottom-6 left-3 z-30 rounded-full bg-card/95 px-3 py-2 text-[11px] font-bold text-foreground shadow-elev-md backdrop-blur active:scale-95 transition-base"
+            aria-label="Center map on my location"
+          >
+            Recenter
+          </button>
 
           {/* Pins */}
           {localOffers.map((o) => {
-            const pct = projectToPct(bounds, o.geo.lat, o.geo.lng);
+            const pointStyle = getPointStyle(mapCenter, o.geo, mapZoom);
             return (
               <button
                 key={o.id}
@@ -115,7 +279,7 @@ const Map = () => {
                   "absolute -translate-x-1/2 -translate-y-full transition-spring",
                   selected.id === o.id ? "z-20 scale-110" : "z-10 scale-100"
                 )}
-                style={{ left: `${pct.x}%`, top: `${pct.y}%` }}
+                style={pointStyle}
               >
                 <div
                   className={cn(
@@ -135,7 +299,7 @@ const Map = () => {
           {/* User pin */}
           <div
             className="absolute -translate-x-1/2 -translate-y-1/2 transition-spring"
-            style={{ left: `${userPct.x}%`, top: `${userPct.y}%` }}
+            style={userPointStyle}
           >
             <div className="relative h-4 w-4">
               <span
