@@ -24,15 +24,30 @@ const offsetLatLng = (
 };
 
 /** Build offers re-anchored around the user's real coordinates. */
-export const buildLocalOffers = (user: {
-  lat: number;
-  lng: number;
-}): Offer[] => {
+export const buildLocalOffers = (
+  user: { lat: number; lng: number },
+  district?: string
+): Offer[] => {
+  const localBrands = district
+    ? [
+        { name: `Café ${district}`, address: `Main St · ${district}` },
+        { name: `${district} Bakery`, address: `Baker Ln · ${district}` },
+        { name: `LunchBox ${district}`, address: `Market Sq · ${district}` },
+        { name: `Urban Books & Coffee`, address: `Reading Row · ${district}` },
+      ]
+    : null;
+
   return templateOffers.map((tpl, i) => {
     const off = OFFSETS_M[i % OFFSETS_M.length];
     const geo = offsetLatLng(user, off.dN, off.dE);
     const distanceM = haversineMeters(user, geo);
-    return { ...tpl, geo, distanceM };
+    const brand = localBrands?.[i];
+    return {
+      ...tpl,
+      geo,
+      distanceM,
+      ...(brand ? { merchant: brand.name, address: brand.address } : {}),
+    };
   });
 };
 

@@ -3,9 +3,11 @@ import { activity, merchantAnalytics } from "@/data/mock";
 import { ArrowDown, ArrowUp, Sparkles, TrendingUp, Receipt, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useLocale } from "@/context/LocaleContext";
 
 const Activity = () => {
   const [tab, setTab] = useState<"wallet" | "analytics">("wallet");
+  const locale = useLocale();
   return (
     <MobileShell>
       <header className="px-5 pt-12 pb-3">
@@ -49,7 +51,7 @@ const Activity = () => {
                   a.amount > 0 ? "text-success" : "text-foreground"
                 )}>
                   {a.amount > 0 ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-                  €{Math.abs(a.amount).toFixed(2)}
+                  {locale.formatPrice(Math.abs(a.amount))}
                 </p>
               )}
               {a.amount === 0 && (
@@ -64,7 +66,7 @@ const Activity = () => {
             <KPI icon={<Sparkles className="h-4 w-4" />} label="Offers generated" value={merchantAnalytics.offersGenerated.toString()} trend="+12%" />
             <KPI icon={<Target className="h-4 w-4" />} label="Conversion" value={`${merchantAnalytics.conversionRate}%`} trend="+3.4pp" />
             <KPI icon={<Receipt className="h-4 w-4" />} label="Redemptions" value={merchantAnalytics.redemptions.toString()} trend="+8" />
-            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Revenue" value={`€${merchantAnalytics.incrementalRevenue}`} trend="+€240" />
+            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Revenue" value={locale.formatPrice(merchantAnalytics.incrementalRevenue)} trend={`+${locale.formatPrice(240)}`} />
           </div>
 
           <div className="rounded-2xl bg-card border border-border p-4">
@@ -91,7 +93,7 @@ const Activity = () => {
           <div className="rounded-2xl bg-gradient-card text-primary-foreground p-4 shadow-card-premium relative overflow-hidden">
             <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
             <p className="text-[11px] uppercase tracking-wider opacity-90 font-semibold relative">Estimated incremental revenue</p>
-            <p className="font-display font-extrabold text-3xl mt-1 relative">€ {merchantAnalytics.incrementalRevenue.toLocaleString()}</p>
+            <p className="font-display font-extrabold text-3xl mt-1 relative">{locale.formatPrice(merchantAnalytics.incrementalRevenue)}</p>
             <p className="text-xs opacity-90 mt-1 relative">attributable to AI-targeted offers this month</p>
           </div>
         </section>

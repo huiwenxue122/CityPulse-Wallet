@@ -1,14 +1,18 @@
 import { MobileShell } from "@/components/MobileShell";
-import { offers, merchants } from "@/data/mock";
+import { merchants } from "@/data/mock";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ChevronLeft, MapPin, Clock, Sparkles, ShieldCheck, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocalizedOffer } from "@/hooks/useLocalizedOffers";
+import { useLocale } from "@/context/LocaleContext";
 
 const OfferDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const offer = offers.find(o => o.id === id) ?? offers[0];
-  const merchant = merchants.find(m => m.id === offer.merchantId)!;
+  const offer = useLocalizedOffer(id);
+  const locale = useLocale();
+  const merchantTpl = merchants.find(m => m.id === offer.merchantId)!;
+  const merchant = { ...merchantTpl, name: offer.merchant, address: offer.address };
 
   return (
     <MobileShell hideNav>
@@ -30,8 +34,8 @@ const OfferDetail = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground font-medium">Your price</p>
-            <p className="font-display font-extrabold text-3xl text-foreground">€ {offer.finalPrice.toFixed(2)}</p>
-            <p className="text-xs text-muted-foreground line-through">€ {offer.originalPrice.toFixed(2)}</p>
+            <p className="font-display font-extrabold text-3xl text-foreground">{locale.formatPrice(offer.finalPrice)}</p>
+            <p className="text-xs text-muted-foreground line-through">{locale.formatPrice(offer.originalPrice)}</p>
           </div>
           <div className="rounded-xl bg-primary/10 text-primary px-3 py-2 text-center">
             <p className="font-display font-extrabold text-2xl leading-none">-{offer.discount}%</p>

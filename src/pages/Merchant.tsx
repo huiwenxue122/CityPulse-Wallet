@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import { merchantAnalytics } from "@/data/mock";
 import { Sparkles, Target, Clock, Tag, MapPin, Palette, ArrowLeft, TrendingUp, Receipt, Eye, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/context/LocaleContext";
 
 const goals = ["Increase afternoon foot traffic", "Sell slow inventory", "Attract new customers", "Boost weekday lunch"];
 const tones = ["Cozy & local", "Student-friendly", "Premium", "Playful"];
 const inventories = ["Pastries", "Coffee drinks", "Sandwiches", "Books"];
 
 const Merchant = () => {
+  const locale = useLocale();
   const [goal, setGoal] = useState(goals[0]);
   const [maxDiscount, setMaxDiscount] = useState(20);
   const [slowFrom, setSlowFrom] = useState(14);
@@ -72,7 +74,7 @@ const Merchant = () => {
             <KPI icon={<Sparkles className="h-4 w-4" />} label="Offers generated" value={merchantAnalytics.offersGenerated.toString()} trend="+12%" />
             <KPI icon={<Target className="h-4 w-4" />} label="Conversion" value={`${merchantAnalytics.conversionRate}%`} trend="+3.4pp" />
             <KPI icon={<Receipt className="h-4 w-4" />} label="Redemptions" value={merchantAnalytics.redemptions.toString()} trend="+8" />
-            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Incr. revenue" value={`€${merchantAnalytics.incrementalRevenue}`} trend="+€240" />
+            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Incr. revenue" value={locale.formatPrice(merchantAnalytics.incrementalRevenue)} trend={`+${locale.formatPrice(240)}`} />
           </div>
 
           <div className="rounded-3xl bg-card border border-border shadow-elev-sm p-6">

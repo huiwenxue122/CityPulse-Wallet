@@ -1,14 +1,18 @@
 import { MobileShell } from "@/components/MobileShell";
-import { offers, merchants, user } from "@/data/mock";
+import { merchants, user } from "@/data/mock";
 import { Link, useParams } from "react-router-dom";
 import { CheckCircle2, Wallet, Receipt, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { useLocalizedOffer } from "@/hooks/useLocalizedOffers";
+import { useLocale } from "@/context/LocaleContext";
 
 const Redeem = () => {
   const { id } = useParams();
-  const offer = offers.find(o => o.id === id) ?? offers[0];
-  const merchant = merchants.find(m => m.id === offer.merchantId)!;
+  const offer = useLocalizedOffer(id);
+  const locale = useLocale();
+  const merchantTpl = merchants.find(m => m.id === offer.merchantId)!;
+  const merchant = { ...merchantTpl, name: offer.merchant };
   const [shown, setShown] = useState(false);
   useEffect(() => { const t = setTimeout(() => setShown(true), 50); return () => clearTimeout(t); }, []);
 
@@ -25,7 +29,7 @@ const Redeem = () => {
         </div>
         <div className="relative text-center mt-4">
           <p className="text-[11px] uppercase tracking-wider opacity-90 font-semibold">Payment confirmed</p>
-          <h1 className="font-display font-extrabold text-2xl mt-1">€ {offer.finalPrice.toFixed(2)} paid</h1>
+          <h1 className="font-display font-extrabold text-2xl mt-1">{locale.formatPrice(offer.finalPrice)} paid</h1>
           <p className="text-sm opacity-90 mt-1">to {merchant.name}</p>
         </div>
       </div>
@@ -42,11 +46,11 @@ const Redeem = () => {
         <div className="mt-5 pt-5 border-t border-dashed border-border space-y-2.5">
           <Row label="Offer" value={offer.title} />
           <Row label="Merchant" value={merchant.name} />
-          <Row label="Original" value={`€ ${offer.originalPrice.toFixed(2)}`} muted strike />
-          <Row label={`Discount (${offer.discount}%)`} value={`− € ${(offer.originalPrice - offer.finalPrice).toFixed(2)}`} accent />
+          <Row label="Original" value={locale.formatPrice(offer.originalPrice)} muted strike />
+          <Row label={`Discount (${offer.discount}%)`} value={`− ${locale.formatPrice(offer.originalPrice - offer.finalPrice)}`} accent />
           <div className="pt-2.5 mt-2.5 border-t border-border flex items-center justify-between">
             <span className="font-display font-bold text-foreground">Total paid</span>
-            <span className="font-display font-extrabold text-lg text-foreground">€ {offer.finalPrice.toFixed(2)}</span>
+            <span className="font-display font-extrabold text-lg text-foreground">{locale.formatPrice(offer.finalPrice)}</span>
           </div>
           <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
             <span className="flex items-center gap-1.5"><Wallet className="h-3.5 w-3.5" /> City Wallet •••• {user.cardLast4}</span>
@@ -60,7 +64,7 @@ const Redeem = () => {
           <Receipt className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold text-sm text-foreground">Merchant credited instantly</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{merchant.name} received € {offer.finalPrice.toFixed(2)}. A digital receipt has been added to your Activity.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{merchant.name} received {locale.formatPrice(offer.finalPrice)}. A digital receipt has been added to your Activity.</p>
           </div>
         </div>
       </section>
