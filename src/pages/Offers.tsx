@@ -10,6 +10,7 @@ const filters = ["All", "Café", "Bakery", "Lunch", "Bookstore Café"];
 
 const Offers = () => {
   const [active, setActive] = useState("All");
+  const offers = useLocalizedOffers();
   const filtered = active === "All" ? offers : offers.filter(o => o.category === active);
 
   return (
