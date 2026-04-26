@@ -18,7 +18,7 @@ http://localhost:8080/welcome
 
 ### App Entry Screen
 
-![CityPulse Wallet welcome screen](./welcomepage.png)
+<img src="./welcomepage.png" alt="CityPulse Wallet welcome screen" width="260" />
 
 Recommended demo path:
 
