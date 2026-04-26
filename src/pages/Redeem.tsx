@@ -77,7 +77,7 @@ const Redeem = () => {
       </section>
 
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-5 bg-gradient-to-t from-background via-background to-transparent pb-[calc(env(safe-area-inset-bottom)+16px)]">
-        <Link to="/" className="flex items-center justify-center gap-2 w-full rounded-2xl bg-primary text-primary-foreground py-4 font-display font-bold text-base shadow-elev-md hover:bg-primary-deep transition-base">
+        <Link to="/home" className="flex items-center justify-center gap-2 w-full rounded-2xl bg-primary text-primary-foreground py-4 font-display font-bold text-base shadow-elev-md hover:bg-primary-deep transition-base">
           <Home className="h-4 w-4" /> Back to Wallet
         </Link>
       </div>
