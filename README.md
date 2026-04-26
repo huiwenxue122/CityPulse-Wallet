@@ -63,6 +63,82 @@ The backend then asks an LLM to generate a structured wallet offer, validates th
 - Guardrail validator that clamps discount and checks product, time, and radius rules.
 - Wallet pass creation, pass redemption, and merchant result updates.
 
+## Product Flow
+
+```mermaid
+flowchart LR
+  Welcome["Welcome screen"] --> Merchant["Merchant sets goal"]
+  Merchant --> AI["AI generates safe offer"]
+  AI --> Activate["Merchant activates offer"]
+  Activate --> Customer["Customer sees offer"]
+  Customer --> Wallet["Use now adds wallet pass"]
+  Wallet --> Redeem["Customer redeems pass"]
+  Redeem --> Results["Merchant results update"]
+```
+
+## System Architecture
+
+```mermaid
+flowchart TB
+  subgraph Frontend["Vercel frontend: React + Vite"]
+    Routes["Customer + Merchant routes"]
+    ApiClient["src/lib/api.ts"]
+    Routes --> ApiClient
+  end
+
+  subgraph Backend["Render backend: Express API"]
+    ApiRoutes["server/index.ts"]
+    Store["In-memory store"]
+    LLM["LLM offer service"]
+    Guardrails["Guardrail validator"]
+  end
+
+  subgraph External["External services"]
+    OpenAI["OpenAI API"]
+    Events["Optional Ticketmaster events"]
+    Weather["Weather / city context"]
+  end
+
+  ApiClient --> ApiRoutes
+  ApiRoutes --> Store
+  ApiRoutes --> LLM
+  LLM --> OpenAI
+  LLM --> Guardrails
+  Guardrails --> Store
+  Routes --> Events
+  Routes --> Weather
+```
+
+## AI Offer Generation Sequence
+
+```mermaid
+sequenceDiagram
+  participant Merchant as Merchant Mode
+  participant API as Express API
+  participant Context as City Context
+  participant LLM as OpenAI / Fallback
+  participant Guardrails as Guardrail Validator
+  participant Store as In-memory Store
+  participant Customer as Customer Mode
+
+  Merchant->>API: POST /api/merchant/goal
+  API->>Store: Save goal + guardrails
+  Merchant->>API: POST /api/offers/generate
+  API->>Context: Load weather, demand, activity
+  API->>LLM: Generate structured offer JSON
+  LLM-->>API: title, copy, discount, whyNow
+  API->>Guardrails: Validate discount, product, time, radius
+  Guardrails-->>API: Safe offer
+  API->>Store: Save draft offer
+  Merchant->>API: POST /api/offers/:id/activate
+  API->>Store: Mark offer active
+  Customer->>API: GET /api/offers/active
+  Customer->>API: POST /api/wallet/passes
+  API->>Store: Create active wallet pass
+  Customer->>API: POST /api/wallet/passes/:id/redeem
+  API->>Store: Mark used + update results
+```
+
 ## Tech Stack
 
 - React 18
@@ -170,82 +246,6 @@ GET  /api/merchant/results
 ```
 
 The route `POST /api/redeem` is kept as a compatibility alias for adding an offer to the wallet. The actual pass redemption step is `POST /api/wallet/passes/:passId/redeem`.
-
-## Product Flow
-
-```mermaid
-flowchart LR
-  Welcome["Welcome screen"] --> Merchant["Merchant sets goal"]
-  Merchant --> AI["AI generates safe offer"]
-  AI --> Activate["Merchant activates offer"]
-  Activate --> Customer["Customer sees offer"]
-  Customer --> Wallet["Use now adds wallet pass"]
-  Wallet --> Redeem["Customer redeems pass"]
-  Redeem --> Results["Merchant results update"]
-```
-
-## System Architecture
-
-```mermaid
-flowchart TB
-  subgraph Frontend["Vercel frontend: React + Vite"]
-    Routes["Customer + Merchant routes"]
-    ApiClient["src/lib/api.ts"]
-    Routes --> ApiClient
-  end
-
-  subgraph Backend["Render backend: Express API"]
-    ApiRoutes["server/index.ts"]
-    Store["In-memory store"]
-    LLM["LLM offer service"]
-    Guardrails["Guardrail validator"]
-  end
-
-  subgraph External["External services"]
-    OpenAI["OpenAI API"]
-    Events["Optional Ticketmaster events"]
-    Weather["Weather / city context"]
-  end
-
-  ApiClient --> ApiRoutes
-  ApiRoutes --> Store
-  ApiRoutes --> LLM
-  LLM --> OpenAI
-  LLM --> Guardrails
-  Guardrails --> Store
-  Routes --> Events
-  Routes --> Weather
-```
-
-## AI Offer Generation Sequence
-
-```mermaid
-sequenceDiagram
-  participant Merchant as Merchant Mode
-  participant API as Express API
-  participant Context as City Context
-  participant LLM as OpenAI / Fallback
-  participant Guardrails as Guardrail Validator
-  participant Store as In-memory Store
-  participant Customer as Customer Mode
-
-  Merchant->>API: POST /api/merchant/goal
-  API->>Store: Save goal + guardrails
-  Merchant->>API: POST /api/offers/generate
-  API->>Context: Load weather, demand, activity
-  API->>LLM: Generate structured offer JSON
-  LLM-->>API: title, copy, discount, whyNow
-  API->>Guardrails: Validate discount, product, time, radius
-  Guardrails-->>API: Safe offer
-  API->>Store: Save draft offer
-  Merchant->>API: POST /api/offers/:id/activate
-  API->>Store: Mark offer active
-  Customer->>API: GET /api/offers/active
-  Customer->>API: POST /api/wallet/passes
-  API->>Store: Create active wallet pass
-  Customer->>API: POST /api/wallet/passes/:id/redeem
-  API->>Store: Mark used + update results
-```
 
 ## Project Structure
 
