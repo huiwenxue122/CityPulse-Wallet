@@ -1,6 +1,6 @@
 # CityPulse Wallet
 
-Created by **Claire Xue & Chole Zhang** for the DSV-Gruppe **Generative City-Wallet** hackathon challenge.
+Created by **Claire Xue & Chloe Zhang** for the DSV-Gruppe **Generative City-Wallet** hackathon challenge.
 
 **Live Demo:** [https://city-pulse-wallet.vercel.app/](https://city-pulse-wallet.vercel.app/)
 
