@@ -124,13 +124,80 @@ npm run preview
 ## Project Structure
 
 ```txt
-src/
-  components/      Shared UI and app components
-  pages/           Customer, merchant, welcome, and detail routes
-  hooks/           Weather, event, and localized offer hooks
-  lib/             Offer engine, filtering, geo, weather, and utility logic
-  data/            Mock offers and captured demo snapshot
-  context/         Locale and activity context
+CityPulse Wallet
+├── /welcome
+│   └── App entry screen
+│       ├── Continue to customer wallet
+│       └── Open Merchant Mode
+│
+├── Customer App
+│   ├── /                  Home
+│   │   ├── live city context
+│   │   ├── AI-matched hero offer
+│   │   └── offer feed
+│   ├── /discover          Offers + live map
+│   ├── /offer/:id         Offer detail
+│   ├── /redeem/:id        Redemption flow
+│   ├── /passes            Active / upcoming / used passes
+│   └── /profile           Customer profile
+│
+├── Merchant Mode
+│   ├── /merchant          Merchant home
+│   │   ├── current goal
+│   │   ├── AI offer summary
+│   │   └── lightweight results
+│   ├── /merchant/goal     Goal + guardrails setup
+│   ├── /merchant/review   AI offer review
+│   └── /merchant/profile  Merchant profile
+│
+└── Core App Layers
+    ├── src/components/    Shared UI, nav, cards, map, wallet surfaces
+    ├── src/pages/         Route-level screens
+    ├── src/hooks/         Weather, events, and localized offer hooks
+    ├── src/lib/           Offer engine, filtering, geo, weather utilities
+    ├── src/data/          Mock offers and captured demo snapshot
+    └── src/context/       Locale and activity state
+```
+
+## Architecture Diagram
+
+```mermaid
+flowchart TD
+  W["/welcome\nEntry screen"] --> C["Customer App"]
+  W --> M["Merchant Mode"]
+
+  C --> CH["/ Home\nCity context + AI hero offer"]
+  C --> CD["/discover\nOffer directory + live map"]
+  C --> CP["/passes\nWallet / passbook"]
+  C --> CR["/redeem/:id\nRedemption flow"]
+
+  M --> MH["/merchant\nGoal → AI offer → results"]
+  M --> MG["/merchant/goal\nGoal + guardrails setup"]
+  M --> MR["/merchant/review\nAI offer review + activation"]
+
+  CH --> H["React hooks"]
+  CD --> H
+  MH --> E["Offer intelligence layer"]
+  MG --> E
+  MR --> E
+
+  H --> HW["useCityWeather"]
+  H --> HE["useLocalEvents"]
+  H --> HO["useLocalizedOffers"]
+
+  HW --> API1["Open-Meteo weather API"]
+  HE --> API2["Ticketmaster / local event signals"]
+  HO --> E
+
+  E --> OE["offerEngine.ts\nscoring + generated offer copy"]
+  E --> OD["offerDirectory.ts\ncategory + contextual filters"]
+  E --> D["data/mock.ts\nbase merchants + offers"]
+  E --> S["liveSnapshot.json\ncaptured demo context"]
+
+  OE --> UI["Wallet-ready offer UI"]
+  OD --> UI
+  D --> UI
+  S --> UI
 ```
 
 ## Hackathon Story
