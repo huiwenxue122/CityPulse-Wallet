@@ -83,7 +83,13 @@ flowchart TB
   subgraph Frontend["Vercel frontend: React + Vite"]
     Routes["Customer + Merchant routes"]
     ApiClient["src/lib/api.ts"]
+    Geo["Browser Geolocation"]
+    Clock["Browser time + Intl formatting"]
+    MapUI["Live map UI"]
     Routes --> ApiClient
+    Routes --> Geo
+    Routes --> Clock
+    Routes --> MapUI
   end
 
   subgraph Backend["Render backend: Express API"]
@@ -93,10 +99,16 @@ flowchart TB
     Guardrails["Guardrail validator"]
   end
 
-  subgraph External["External services"]
+  subgraph Realtime["Real-time data sources"]
+    OpenMeteo["Open-Meteo weather"]
+    OSMTiles["OpenStreetMap tile server"]
+    Overpass["OpenStreetMap Overpass POI/events"]
+    Nominatim["OpenStreetMap Nominatim reverse geocoding"]
+    Ticketmaster["Ticketmaster Discovery events"]
+  end
+
+  subgraph AI["AI service"]
     OpenAI["OpenAI API"]
-    Events["Optional Ticketmaster events"]
-    Weather["Weather / city context"]
   end
 
   ApiClient --> ApiRoutes
@@ -105,8 +117,11 @@ flowchart TB
   LLM --> OpenAI
   LLM --> Guardrails
   Guardrails --> Store
-  Routes --> Events
-  Routes --> Weather
+  Geo --> OpenMeteo
+  Geo --> Nominatim
+  Geo --> Overpass
+  Geo --> Ticketmaster
+  MapUI --> OSMTiles
 ```
 
 ## AI Offer Generation Sequence
