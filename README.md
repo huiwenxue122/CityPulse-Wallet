@@ -1,5 +1,7 @@
 # CityPulse Wallet
 
+Created by **Claire Xue** for the DSV-Gruppe Generative City-Wallet hackathon challenge.
+
 CityPulse Wallet is an AI-powered city wallet that turns real-time city signals into personalized, wallet-ready local offers.
 
 Built for the DSV-Gruppe **Generative City-Wallet** hackathon challenge, the project demonstrates how a city wallet can serve both residents and local merchants: users receive relevant offers at the right moment, while merchants set simple business goals and let AI generate safe, localized promotions.
