@@ -1,7 +1,10 @@
 import { MobileShell } from "@/components/MobileShell";
 import { CheckCircle2, Coffee, Film, Landmark, QrCode, Ticket, Train } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api, type ApiPass } from "@/lib/api";
+import { useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 type PassTab = "active" | "upcoming" | "used";
 
@@ -9,6 +12,7 @@ type Pass = {
   id: string;
   kind: "movie" | "offer" | "transit" | "event" | "used";
   tab: PassTab;
+  generated?: boolean;
   title: string;
   merchant: string;
   meta: string;
@@ -86,8 +90,37 @@ const primaryAction = (pass: Pass) => {
 };
 
 const Activity = () => {
-  const [tab, setTab] = useState<PassTab>("active");
-  const visiblePasses = passes.filter((pass) => pass.tab === tab);
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get("tab");
+  const [tab, setTab] = useState<PassTab>(
+    initialTab === "used" || initialTab === "upcoming" || initialTab === "active"
+      ? initialTab
+      : "active"
+  );
+  const [apiPasses, setApiPasses] = useState<ApiPass[]>([]);
+  const [redeemingPassId, setRedeemingPassId] = useState<string | null>(null);
+  useEffect(() => {
+    api.getPasses().then(setApiPasses).catch(() => setApiPasses([]));
+  }, []);
+
+  const uniqueApiPasses = apiPasses.filter((pass, index, currentPasses) =>
+    currentPasses.findIndex((candidate) => candidate.offerId === pass.offerId) === index
+  );
+
+  const backendPasses: Pass[] = uniqueApiPasses.map((pass) => ({
+    id: pass.passId,
+    kind: pass.status === "used" ? "used" : "offer",
+    tab: pass.status === "used" ? "used" : "active",
+    generated: true,
+    title: `${pass.discountPercent}% off ${pass.title}`,
+    merchant: pass.merchantName,
+    meta: pass.status === "used" ? "Redeemed just now" : "Ready to redeem",
+    detail: `QR ${pass.qrCode}`,
+    icon: pass.status === "used" ? <CheckCircle2 className="h-5 w-5" /> : <Coffee className="h-5 w-5" />,
+    tone: pass.status === "used" ? "bg-secondary text-muted-foreground" : "bg-amber-500/10 text-amber-700",
+  }));
+  const allPasses = [...backendPasses, ...passes];
+  const visiblePasses = allPasses.filter((pass) => pass.tab === tab);
   const scanReadyCount = visiblePasses.filter((pass) =>
     ["movie", "transit", "event"].includes(pass.kind)
   ).length;
@@ -97,6 +130,26 @@ const Activity = () => {
       : tab === "upcoming"
         ? `${visiblePasses.length} upcoming pass · starts soon`
         : `${visiblePasses.length} used pass · receipt saved`;
+
+  const handleRedeemPass = async (pass: Pass) => {
+    if (!pass.generated || pass.tab !== "active") return;
+    setRedeemingPassId(pass.id);
+    try {
+      const result = await api.redeemPass(pass.id, 12);
+      setApiPasses((currentPasses) =>
+        currentPasses.map((currentPass) =>
+          currentPass.passId === result.pass.passId ? result.pass : currentPass
+        )
+      );
+      toast.success("Pass redeemed");
+      setTab("used");
+    } catch (error) {
+      console.error(error);
+      toast.error("Could not redeem pass");
+    } finally {
+      setRedeemingPassId(null);
+    }
+  };
 
   return (
     <MobileShell>
@@ -133,9 +186,16 @@ const Activity = () => {
                 {pass.icon}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
-                  {pass.merchant}
-                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+                    {pass.merchant}
+                  </p>
+                  {pass.generated && (
+                    <span className="shrink-0 rounded-full bg-success/10 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-success">
+                      New wallet pass
+                    </span>
+                  )}
+                </div>
                 <h3 className="font-display font-bold text-base text-foreground mt-0.5">
                   {pass.title}
                 </h3>
@@ -145,9 +205,14 @@ const Activity = () => {
             </div>
 
             <div className="mt-4 grid grid-cols-[1fr_auto] gap-2">
-              <button className="inline-flex items-center justify-center gap-1 rounded-xl bg-primary text-primary-foreground py-2 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => handleRedeemPass(pass)}
+                disabled={redeemingPassId === pass.id}
+                className="inline-flex items-center justify-center gap-1 rounded-xl bg-primary text-primary-foreground py-2 text-xs font-bold disabled:opacity-70"
+              >
                 {action.icon}
-                {action.label}
+                {redeemingPassId === pass.id ? "Redeeming..." : action.label}
               </button>
               <button className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-bold text-foreground">
                 Details

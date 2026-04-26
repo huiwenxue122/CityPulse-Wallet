@@ -77,6 +77,12 @@ Run locally:
 npm run dev
 ```
 
+Run the backend API in a second terminal:
+
+```bash
+npm run server
+```
+
 Open the app:
 
 ```txt
@@ -101,7 +107,25 @@ If Vite starts on another port, use the URL shown in the terminal.
 
 ## Environment Variables
 
-For optional event enrichment, create a local `.env.local` file:
+Copy the backend environment template:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env`:
+
+```bash
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o-mini
+PORT=3001
+HOST=127.0.0.1
+```
+
+`OPENAI_API_KEY` is read only by the backend. Do not expose it with a `VITE_` prefix.
+If `OPENAI_API_KEY` is missing, the backend uses a deterministic fallback generator so the full demo flow still works.
+
+For optional frontend event enrichment, create a local `.env.local` file:
 
 ```bash
 VITE_TICKETMASTER_API_KEY=your_ticketmaster_api_key

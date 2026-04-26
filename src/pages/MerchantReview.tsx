@@ -1,21 +1,46 @@
-import { Link } from "react-router-dom";
 import { CheckCircle2, Coffee, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { Card, MerchantShell, merchant } from "@/components/MerchantModeShared";
+import { api, type ApiOffer } from "@/lib/api";
 
-const reasons = [
-  "Overcast, 9°C",
-  "Nearby demand is shifting",
-  "This window is usually quiet",
-];
+const fallbackReasons = ["Overcast, 9°C", "Nearby demand is shifting", "This window is usually quiet"];
+const fallbackGuardrails = ["Discount within 15% limit", "Product eligible", "Time window matched"];
 
-const guardrails = [
-  "Discount within 15% limit",
-  "Product eligible",
-  "Time window matched",
-];
+const MerchantReview = () => {
+  const [offer, setOffer] = useState<ApiOffer | null>(null);
+  const [isActivating, setIsActivating] = useState(false);
 
-const MerchantReview = () => (
+  useEffect(() => {
+    api.getLatestOffer()
+      .then(setOffer)
+      .catch(() => setOffer(null));
+  }, []);
+
+  const reasons = offer?.whyNow?.length ? offer.whyNow.slice(0, 3) : fallbackReasons;
+  const guardrails = offer?.guardrails?.length
+    ? offer.guardrails.filter((check) => check.passed).slice(0, 3).map((check) => check.label)
+    : fallbackGuardrails;
+
+  const activateOffer = async () => {
+    if (!offer) {
+      toast.error("Generate an offer first");
+      return;
+    }
+    setIsActivating(true);
+    try {
+      const active = await api.activateOffer(offer.offerId);
+      setOffer(active);
+      toast.success("Offer activated for nearby wallets");
+    } catch (error) {
+      console.error(error);
+      toast.error("Could not activate offer");
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
+  return (
   <MerchantShell title="AI Offer Review">
     <Card className="border-primary/15">
       <div className="flex items-center justify-between gap-2">
@@ -30,10 +55,14 @@ const MerchantReview = () => (
             <Coffee className="h-5 w-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-display text-lg font-extrabold text-foreground">{merchant.offerTitle}</p>
-            <p className="mt-1 text-sm font-bold text-primary">{merchant.offerDetail}</p>
-            <p className="mt-1 text-xs font-semibold text-warning">{merchant.shortValidity}</p>
-            <p className="mt-2 text-sm text-foreground">“{merchant.customerText}”</p>
+            <p className="font-display text-lg font-extrabold text-foreground">{offer?.title ?? merchant.offerTitle}</p>
+            <p className="mt-1 text-sm font-bold text-primary">
+              {offer ? `${offer.discountPercent}% off ${offer.products.join(" + ")}` : merchant.offerDetail}
+            </p>
+            <p className="mt-1 text-xs font-semibold text-warning">
+              {offer ? `Valid ${offer.validMinutes} min` : merchant.shortValidity}
+            </p>
+            <p className="mt-2 text-sm text-foreground">“{offer?.description ?? merchant.customerText}”</p>
           </div>
         </div>
       </div>
@@ -70,16 +99,18 @@ const MerchantReview = () => (
     <div className="space-y-2">
       <button
         type="button"
-        onClick={() => toast.success("Offer activated for nearby wallets")}
+        onClick={activateOffer}
+        disabled={isActivating}
         className="w-full rounded-xl bg-primary py-2.5 text-sm font-display font-bold text-primary-foreground shadow-elev-sm"
       >
-        Activate offer
+        {isActivating ? "Activating..." : "Activate offer"}
       </button>
-      <Link to="/merchant/goal" className="block w-full rounded-xl border border-border bg-card py-2.5 text-center text-sm font-display font-bold text-foreground">
+      <a href="/merchant/goal" className="block w-full rounded-xl border border-border bg-card py-2.5 text-center text-sm font-display font-bold text-foreground">
         Edit goal
-      </Link>
+      </a>
     </div>
   </MerchantShell>
-);
+  );
+};
 
 export default MerchantReview;

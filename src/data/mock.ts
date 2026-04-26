@@ -53,7 +53,7 @@ export const cityContext = {
 };
 
 export const merchants = [
-  { id: "cafe-mitte", name: "Café Mitte", category: "Café", address: "Rosenthaler Str. 38, 10178 Berlin", rating: 4.7 },
+  { id: "cafe-mitte", name: "Chloe’s Café", category: "Café", address: "Rosenthaler Str. 38, 10178 Berlin", rating: 4.7 },
   { id: "kiez-bakery", name: "Kiez Bakery", category: "Bakery", address: "Auguststraße 11, 10117 Berlin", rating: 4.8 },
   { id: "lunchbox-alex", name: "LunchBox Alexanderplatz", category: "Lunch", address: "Alexanderplatz 7, 10178 Berlin", rating: 4.5 },
   { id: "urban-books", name: "Urban Books & Coffee", category: "Bookstore Café", address: "Tucholskystraße 32, 10117 Berlin", rating: 4.9 },
@@ -62,7 +62,7 @@ export const merchants = [
 export const offers: Offer[] = [
   {
     id: "of-1",
-    merchant: "Café Mitte",
+    merchant: "Chloe’s Café",
     merchantId: "cafe-mitte",
     category: "Café",
     title: "Rainy Afternoon Comfort Deal",
@@ -147,7 +147,7 @@ export const offers: Offer[] = [
 ];
 
 export const activity = [
-  { id: "a1", type: "redeemed", merchant: "Café Mitte", amount: -6.30, label: "Comfort Combo", time: "Today, 14:12", icon: "☕" },
+  { id: "a1", type: "redeemed", merchant: "Chloe’s Café", amount: -6.30, label: "Comfort Combo", time: "Today, 14:12", icon: "☕" },
   { id: "a2", type: "offer_generated", merchant: "Kiez Bakery", amount: 0, label: "Offer surfaced", time: "Today, 13:45", icon: "✨" },
   { id: "a3", type: "topup", merchant: "Sparkasse", amount: 50.00, label: "Wallet top-up", time: "Today, 09:02", icon: "↑" },
   { id: "a4", type: "redeemed", merchant: "Urban Books & Coffee", amount: -14.20, label: "Reader's Hour", time: "Mon, 16:30", icon: "📚" },
@@ -174,7 +174,7 @@ export const merchantAnalytics = {
 };
 
 export const user = {
-  name: "Emily Carter",
+  name: "Claire Xue",
   iban: "DE89 1005 0000 0123 4567",
   cardLast4: "4451",
   balance: 1247.83,

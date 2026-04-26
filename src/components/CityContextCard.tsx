@@ -1,11 +1,13 @@
 import { Bell, MapPin } from "lucide-react";
 import { useLocale } from "@/context/LocaleContext";
 import { useCityWeather } from "@/hooks/useCityWeather";
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useLocalizedOffers } from "@/hooks/useLocalizedOffers";
 import type { Offer } from "@/data/mock";
 import { OfferCard } from "@/components/OfferCard";
+import { api, type ApiOffer } from "@/lib/api";
 
 const minutesUntilWindowEnd = (validWindow: string | undefined, now: Date) => {
   if (!validWindow) return null;
@@ -47,8 +49,12 @@ const pickTodaysBestOffer = (offers: Offer[], now: Date) => {
 export const CityContextCard = ({ featuredOffer }: { featuredOffer?: Offer }) => {
   const locale = useLocale();
   const weather = useCityWeather();
+  const navigate = useNavigate();
   const { offers } = useLocalizedOffers();
   const [now, setNow] = useState(() => new Date());
+  const [activeApiOffer, setActiveApiOffer] = useState<ApiOffer | null>(null);
+  const [isRedeeming, setIsRedeeming] = useState(false);
+  const redeemLockRef = useRef(false);
   const bestOffer = useMemo(
     () => featuredOffer ?? pickTodaysBestOffer(offers, now),
     [featuredOffer, offers, now]
@@ -62,6 +68,42 @@ export const CityContextCard = ({ featuredOffer }: { featuredOffer?: Offer }) =>
     const tick = window.setInterval(() => setNow(new Date()), 15_000);
     return () => window.clearInterval(tick);
   }, []);
+
+  useEffect(() => {
+    api.getActiveOffer()
+      .then(setActiveApiOffer)
+      .catch(() => setActiveApiOffer(null));
+  }, []);
+
+  const redeemActiveOffer = async () => {
+    if (!activeApiOffer || redeemLockRef.current) return;
+    redeemLockRef.current = true;
+    setIsRedeeming(true);
+    try {
+      const result = await api.addOfferToWallet(activeApiOffer.offerId, 12);
+      toast.success(result.alreadyInWallet ? "This pass is already in your wallet" : "Pass added to your wallet");
+      navigate("/passes?tab=active");
+    } catch (error) {
+      console.error(error);
+      toast.error("Could not add pass to wallet");
+    } finally {
+      redeemLockRef.current = false;
+      setIsRedeeming(false);
+    }
+  };
+
+  const heroTitle = activeApiOffer?.headline ?? bestOffer?.title;
+  const heroMerchantLine = activeApiOffer
+    ? `${activeApiOffer.merchantName} · ${activeApiOffer.title}`
+    : bestOffer
+      ? `${bestOffer.merchant} · ${bestOffer.title}`
+      : "";
+  const heroDiscount = activeApiOffer?.discountPercent ?? bestOffer?.discount;
+  const heroDescription = activeApiOffer?.description ?? bestOffer?.subtitle;
+  const heroValidMinutes = activeApiOffer?.validMinutes ?? bestOffer?.expiresInMin;
+  const signalChips = activeApiOffer?.whyNow?.length
+    ? activeApiOffer.whyNow.slice(0, 3)
+    : ["142m away", `${weather.weather}, ${weather.tempC}°C`, "Demand shifting"];
 
   return (
   <div className="space-y-3">
@@ -96,24 +138,62 @@ export const CityContextCard = ({ featuredOffer }: { featuredOffer?: Offer }) =>
         <p className="font-display text-lg font-extrabold leading-tight text-primary">
           ✦ Matched to your moment
         </p>
-        {bestOffer && (
+        {(activeApiOffer || bestOffer) && (
           <div className="shrink-0 text-right">
             <span className="inline-flex rounded-full bg-destructive/10 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-destructive">
-              Ends in {bestOffer.expiresInMin}m
+              Ends in {heroValidMinutes}m
             </span>
           </div>
         )}
       </div>
-      {bestOffer ? (
+      {activeApiOffer || bestOffer ? (
         <div className="relative">
-          <OfferCard offer={bestOffer} />
+          {activeApiOffer ? (
+            <div className="rounded-2xl bg-card border border-border p-4 shadow-elev-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    CityPulse AI offer
+                  </p>
+                  <h3 className="mt-1 font-display text-lg font-extrabold leading-tight text-foreground">
+                    {heroTitle}
+                  </h3>
+                  <p className="mt-1.5 text-sm font-bold text-primary">{heroMerchantLine}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">{heroDescription}</p>
+                </div>
+                <div className="flex-shrink-0 rounded-xl bg-primary/10 text-primary px-2.5 py-1 text-sm font-bold">
+                  -{heroDiscount}%
+                </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {signalChips.map((signal) => (
+                  <span key={signal} className="rounded-full bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
+                    {signal}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <OfferCard offer={bestOffer} />
+          )}
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <Link
-              to={`/redeem/${bestOffer.id}`}
-              className="rounded-xl bg-primary px-4 py-3 text-center text-sm font-display font-bold text-primary-foreground shadow-elev-sm"
-            >
-              Use now
-            </Link>
+            {activeApiOffer ? (
+              <button
+                type="button"
+                onClick={redeemActiveOffer}
+                disabled={isRedeeming}
+                className="rounded-xl bg-primary px-4 py-3 text-center text-sm font-display font-bold text-primary-foreground shadow-elev-sm disabled:opacity-70"
+              >
+                {isRedeeming ? "Redeeming..." : "Use now"}
+              </button>
+            ) : (
+              <Link
+                to={`/redeem/${bestOffer.id}`}
+                className="rounded-xl bg-primary px-4 py-3 text-center text-sm font-display font-bold text-primary-foreground shadow-elev-sm"
+              >
+                Use now
+              </Link>
+            )}
             <button className="rounded-xl border border-border bg-card px-4 py-3 text-sm font-display font-bold text-foreground">
               Save for later
             </button>

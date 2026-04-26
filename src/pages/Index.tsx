@@ -39,7 +39,7 @@ const Index = () => {
     <MobileShell>
       <header className="px-5 pt-12">
         <h1 className="font-display text-3xl font-extrabold text-foreground">
-          {greeting}, Emily
+          {greeting}, Claire Xue
         </h1>
       </header>
 

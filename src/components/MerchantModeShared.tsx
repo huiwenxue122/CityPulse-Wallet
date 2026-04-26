@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { MobileShell } from "@/components/MobileShell";
 
 export const merchant = {
-  name: "Café Mitte",
+  name: "Chloe’s Café",
   status: "Live",
   category: "Coffee shop",
   location: "Hamburg · HafenCity",
@@ -43,7 +43,7 @@ export const MerchantHeader = ({ title }: { title: string }) => (
           <span className="h-2 w-2 rounded-full bg-success animate-pulse-dot" />
           <span className="whitespace-nowrap text-xs font-semibold text-foreground">{merchant.name} · {merchant.status}</span>
         </div>
-        <div className="h-9 w-9 rounded-full bg-gradient-card text-primary-foreground grid place-items-center text-sm font-bold">CM</div>
+        <div className="h-9 w-9 rounded-full bg-gradient-card text-primary-foreground grid place-items-center text-sm font-bold">CC</div>
       </div>
     </div>
   </header>

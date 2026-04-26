@@ -25,11 +25,11 @@ const Profile = () => {
     <section className="px-5">
       <div className="rounded-2xl bg-card border border-border p-4 flex items-center gap-3">
         <div className="h-14 w-14 rounded-full bg-gradient-card grid place-items-center text-primary-foreground font-display font-extrabold text-xl">
-          {isMerchantMode ? "CM" : user.name.split(" ").map(n => n[0]).join("")}
+          {isMerchantMode ? "CC" : user.name.split(" ").map(n => n[0]).join("")}
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-display font-bold text-base text-foreground">
-            {isMerchantMode ? "Café Mitte" : user.name}
+            {isMerchantMode ? "Chloe’s Café" : user.name}
           </p>
           {!isMerchantMode && (
             <p className="text-xs text-muted-foreground truncate">1 payment method connected</p>

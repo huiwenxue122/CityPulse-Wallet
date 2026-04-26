@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Card, MerchantShell, merchant } from "@/components/MerchantModeShared";
+import { api } from "@/lib/api";
 
 const goals = [
   "Fill quiet hours",
@@ -27,6 +29,7 @@ const Chip = ({ label, selected = false, onClick }: { label: string; selected?: 
 );
 
 const MerchantGoal = () => {
+  const navigate = useNavigate();
   const [selectedGoal, setSelectedGoal] = useState("Fill quiet hours");
   const [selectedProduct, setSelectedProduct] = useState(merchant.products);
   const [selectedTone, setSelectedTone] = useState(merchant.tone);
@@ -34,6 +37,36 @@ const MerchantGoal = () => {
   const [endTime, setEndTime] = useState("20:00");
   const [maxDiscount, setMaxDiscount] = useState(15);
   const [radius, setRadius] = useState(900);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generateOffer = async () => {
+    setIsGenerating(true);
+    try {
+      const products =
+        selectedProduct === "Coffee + pastry"
+          ? ["coffee", "pastry"]
+          : [selectedProduct.toLowerCase()];
+      await api.saveMerchantGoal({
+        merchantId: "m_001",
+        merchantName: "Chloe’s Café",
+        goal: selectedGoal,
+        timeWindow: { start: startTime, end: endTime },
+        maxDiscountPercent: maxDiscount,
+        radiusMeters: radius,
+        products,
+        tone: selectedTone,
+      });
+      const offer = await api.generateOffer();
+      window.localStorage.setItem("citypulse_latest_offer_id", offer.offerId);
+      toast.success("AI offer generated");
+      navigate("/merchant/review");
+    } catch (error) {
+      console.error(error);
+      toast.error("Could not generate offer. Is the API server running?");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <MerchantShell title="Set Goal">
@@ -123,9 +156,14 @@ const MerchantGoal = () => {
         </div>
       </div>
 
-      <Link to="/merchant/review" className="mt-4 block w-full rounded-xl bg-primary py-2.5 text-center text-sm font-display font-bold text-primary-foreground shadow-elev-sm">
-        Let AI generate offer
-      </Link>
+      <button
+        type="button"
+        onClick={generateOffer}
+        disabled={isGenerating}
+        className="mt-4 block w-full rounded-xl bg-primary py-2.5 text-center text-sm font-display font-bold text-primary-foreground shadow-elev-sm disabled:opacity-70"
+      >
+        {isGenerating ? "Generating offer..." : "Let AI generate offer"}
+      </button>
     </Card>
   </MerchantShell>
   );
