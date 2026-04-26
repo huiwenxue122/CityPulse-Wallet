@@ -167,71 +167,80 @@ GET  /api/merchant/results
 
 The route `POST /api/redeem` is kept as a compatibility alias for adding an offer to the wallet. The actual pass redemption step is `POST /api/wallet/passes/:passId/redeem`.
 
-## Architecture
+## Product Flow
 
 ```mermaid
-flowchart TD
-  W["/welcome<br/>Entry screen"] --> Customer["Customer Mode"]
-  W --> Merchant["Merchant Mode"]
-
-  Customer --> Home["/<br/>AI hero offer"]
-  Customer --> Discover["/discover<br/>Map + offer directory"]
-  Customer --> Passes["/passes<br/>Active / Upcoming / Used"]
-  Customer --> Profile["/profile<br/>Claire Xue"]
-
-  Merchant --> MHome["/merchant<br/>Goal + offer + results"]
-  Merchant --> Goal["/merchant/goal<br/>Goal + guardrails"]
-  Merchant --> Review["/merchant/review<br/>AI offer approval"]
-  Merchant --> MProfile["/merchant/profile<br/>Chloe’s Café"]
-
-  Home --> API["src/lib/api.ts<br/>typed fetch client"]
-  Passes --> API
-  Goal --> API
-  Review --> API
-  MHome --> API
-
-  API --> Express["Express API<br/>server/index.ts"]
-
-  Express --> Store["In-memory store<br/>merchant goal, offers, passes, results"]
-  Express --> Context["Mock city context<br/>weather, demand, activity"]
-  Express --> LLM["LLM offer service<br/>server/services/llmOfferService.ts"]
-  Express --> Guardrails["Guardrail validator<br/>server/services/guardrailValidator.ts"]
-
-  LLM --> OpenAI["OpenAI API<br/>structured JSON offer"]
-  LLM --> Fallback["Deterministic fallback<br/>when key missing or timeout"]
-
-  OpenAI --> Guardrails
-  Fallback --> Guardrails
-  Guardrails --> Store
-  Store --> API
+flowchart LR
+  Welcome["Welcome screen"] --> Merchant["Merchant sets goal"]
+  Merchant --> AI["AI generates safe offer"]
+  AI --> Activate["Merchant activates offer"]
+  Activate --> Customer["Customer sees offer"]
+  Customer --> Wallet["Use now adds wallet pass"]
+  Wallet --> Redeem["Customer redeems pass"]
+  Redeem --> Results["Merchant results update"]
 ```
 
-## End-to-End Data Flow
+## System Architecture
+
+```mermaid
+flowchart TB
+  subgraph Frontend["Vercel frontend: React + Vite"]
+    Routes["Customer + Merchant routes"]
+    ApiClient["src/lib/api.ts"]
+    Routes --> ApiClient
+  end
+
+  subgraph Backend["Render backend: Express API"]
+    ApiRoutes["server/index.ts"]
+    Store["In-memory store"]
+    LLM["LLM offer service"]
+    Guardrails["Guardrail validator"]
+  end
+
+  subgraph External["External services"]
+    OpenAI["OpenAI API"]
+    Events["Optional Ticketmaster events"]
+    Weather["Weather / city context"]
+  end
+
+  ApiClient --> ApiRoutes
+  ApiRoutes --> Store
+  ApiRoutes --> LLM
+  LLM --> OpenAI
+  LLM --> Guardrails
+  Guardrails --> Store
+  Routes --> Events
+  Routes --> Weather
+```
+
+## AI Offer Generation Sequence
 
 ```mermaid
 sequenceDiagram
   participant Merchant as Merchant Mode
   participant API as Express API
-  participant AI as OpenAI or Fallback
+  participant Context as City Context
+  participant LLM as OpenAI / Fallback
+  participant Guardrails as Guardrail Validator
   participant Store as In-memory Store
   participant Customer as Customer Mode
 
-  Merchant->>API: Save goal and guardrails
-  API->>Store: Update merchant goal
-  Merchant->>API: Generate offer
-  API->>AI: Request structured wallet offer
-  AI-->>API: Offer JSON
-  API->>API: Validate guardrails
+  Merchant->>API: POST /api/merchant/goal
+  API->>Store: Save goal + guardrails
+  Merchant->>API: POST /api/offers/generate
+  API->>Context: Load weather, demand, activity
+  API->>LLM: Generate structured offer JSON
+  LLM-->>API: title, copy, discount, whyNow
+  API->>Guardrails: Validate discount, product, time, radius
+  Guardrails-->>API: Safe offer
   API->>Store: Save draft offer
-  Merchant->>API: Activate offer
+  Merchant->>API: POST /api/offers/:id/activate
   API->>Store: Mark offer active
-  Customer->>API: Load active offer
-  Customer->>API: Use now / add pass
+  Customer->>API: GET /api/offers/active
+  Customer->>API: POST /api/wallet/passes
   API->>Store: Create active wallet pass
-  Customer->>API: Redeem pass
-  API->>Store: Mark pass used and update results
-  Merchant->>API: Load results
-  API-->>Merchant: Redeemed count and revenue
+  Customer->>API: POST /api/wallet/passes/:id/redeem
+  API->>Store: Mark used + update results
 ```
 
 ## Project Structure
