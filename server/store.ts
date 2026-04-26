@@ -1,7 +1,7 @@
 import type { CityContext, GeneratedOffer, MerchantGoal, Redemption, WalletPass } from "./types";
 
 export const cityContext: CityContext = {
-  location: "Hamburg HafenCity",
+  location: "nearby area",
   weather: "Overcast",
   temperatureC: 9,
   time: "18:45",

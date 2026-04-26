@@ -84,6 +84,7 @@ export const generateOfferWithLlm = async (
                   "products must be selected only from merchantGoal.products",
                   "headline should be user-centered and location-aware",
                   "whyNow should explain weather, demand, time, or merchant goal signals",
+                  "do not mention Hamburg or HafenCity; use neutral wording like nearby or your area",
                 ],
               },
               null,
