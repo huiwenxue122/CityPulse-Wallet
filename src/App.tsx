@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,9 +8,11 @@ import Offers from "./pages/Offers.tsx";
 import OfferDetail from "./pages/OfferDetail.tsx";
 import Redeem from "./pages/Redeem.tsx";
 import Activity from "./pages/Activity.tsx";
-import Map from "./pages/Map.tsx";
 import Profile from "./pages/Profile.tsx";
+import PaymentMethods from "./pages/PaymentMethods.tsx";
 import Merchant from "./pages/Merchant.tsx";
+import MerchantGoal from "./pages/MerchantGoal.tsx";
+import MerchantReview from "./pages/MerchantReview.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { LocaleProvider } from "./context/LocaleContext";
 import { ActivityProvider } from "./context/ActivityContext";
@@ -27,13 +29,18 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/offers" element={<Offers />} />
+              <Route path="/discover" element={<Offers />} />
+              <Route path="/offers" element={<Navigate to="/discover" replace />} />
               <Route path="/offer/:id" element={<OfferDetail />} />
               <Route path="/redeem/:id" element={<Redeem />} />
-              <Route path="/map" element={<Map />} />
-              <Route path="/activity" element={<Activity />} />
+              <Route path="/passes" element={<Activity />} />
+              <Route path="/activity" element={<Navigate to="/passes" replace />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/payment-methods" element={<PaymentMethods />} />
               <Route path="/merchant" element={<Merchant />} />
+              <Route path="/merchant/goal" element={<MerchantGoal />} />
+              <Route path="/merchant/review" element={<MerchantReview />} />
+              <Route path="/merchant/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

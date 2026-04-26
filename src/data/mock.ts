@@ -23,6 +23,8 @@ export type Offer = {
   merchantGoal?: string;
   demandPattern?: string;
   localEvent?: string;
+  eventSource?: "ticketmaster" | "openstreetmap" | "pattern";
+  eventVenueType?: string;
   validWindow?: string;
   generatedAt?: string;
   source?: "demo" | "realtime";
@@ -172,7 +174,7 @@ export const merchantAnalytics = {
 };
 
 export const user = {
-  name: "Lena Schmidt",
+  name: "Emily Carter",
   iban: "DE89 1005 0000 0123 4567",
   cardLast4: "4451",
   balance: 1247.83,

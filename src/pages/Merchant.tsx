@@ -1,311 +1,65 @@
-import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { merchantAnalytics } from "@/data/mock";
-import { Sparkles, Target, Clock, Tag, MapPin, Palette, ArrowLeft, TrendingUp, Receipt, Eye, RefreshCw } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useLocale } from "@/context/LocaleContext";
-import { getDemandPattern, getLocalEventSignal, merchantRules } from "@/lib/offerEngine";
-import { useCityWeather } from "@/hooks/useCityWeather";
-import { useActivity } from "@/context/ActivityContext";
-import { useLocalEvents } from "@/hooks/useLocalEvents";
+import {
+  Card,
+  MerchantShell,
+  merchant,
+} from "@/components/MerchantModeShared";
 
-const goals = ["Increase afternoon foot traffic", "Sell slow inventory", "Attract new customers", "Boost weekday lunch"];
-const tones = ["Cozy & local", "Student-friendly", "Premium", "Playful"];
-const inventories = ["Coffee + pastry", "Fresh pastry box", "Warm lunch combo", "Pastries", "Coffee drinks", "Sandwiches", "Books"];
-
-const eventSourceLabel = (source: string) => {
-  if (source === "ticketmaster") return "Ticketmaster scheduled events";
-  if (source === "openstreetmap") return "OpenStreetMap venue signals";
-  return "Time pattern fallback";
-};
-
-const Merchant = () => {
-  const locale = useLocale();
-  const weather = useCityWeather();
-  const events = useLocalEvents();
-  const { items } = useActivity();
-  const activeRule = merchantRules[0];
-  const [goal, setGoal] = useState(activeRule.goal);
-  const [maxDiscount, setMaxDiscount] = useState(activeRule.maxDiscount);
-  const [slowFrom, setSlowFrom] = useState(activeRule.slowWindow.from);
-  const [slowTo, setSlowTo] = useState(activeRule.slowWindow.to);
-  const [inventory, setInventory] = useState(activeRule.inventoryFocus);
-  const [radius, setRadius] = useState(activeRule.radiusM);
-  const [tone, setTone] = useState<string>(activeRule.tone);
-  const liveDemand = getDemandPattern(new Date(), weather);
-  const liveEvent = getLocalEventSignal(new Date(), locale.district, events.signal);
-  const recentRedemptions = items.filter((item) => item.type === "redeemed").slice(0, 3);
-
-  const preview = useMemo(() => {
-    const titles: Record<string, string> = {
-      "Cozy & local": "Rainy Afternoon Comfort Deal",
-      "Student-friendly": "Study Break Treat",
-      "Premium": "Curator's Afternoon Selection",
-      "Playful": "Sweet o'clock!",
-    };
-    const subs: Record<string, string> = {
-      "Cozy & local": `${maxDiscount}% off ${inventory.toLowerCase()} + warm drink at your café`,
-      "Student-friendly": `${maxDiscount}% off ${inventory.toLowerCase()} — perfect study fuel`,
-      "Premium": `${maxDiscount}% off our finest ${inventory.toLowerCase()} pairing`,
-      "Playful": `${maxDiscount}% off ${inventory.toLowerCase()} — yes, really`,
-    };
-    return {
-      title: titles[tone],
-      subtitle: subs[tone],
-      window: `${slowFrom}:00 – ${slowTo}:00`,
-      whyNow: [
-        goal.toLowerCase().includes("afternoon") ? "Demand drops between 14–17:00" : "Targeting your stated goal",
-        `Pushed to wallets within ${radius}m`,
-        `Tone matched: ${tone.toLowerCase()}`,
-        `${weather.weather}, ${weather.tempC}C`,
-      ],
-    };
-  }, [goal, maxDiscount, slowFrom, slowTo, inventory, radius, tone, weather]);
-
-  return (
-    <div className="min-h-screen bg-gradient-hero">
-      <header className="border-b border-border bg-card/80 backdrop-blur sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link to="/profile" className="h-9 w-9 grid place-items-center rounded-full bg-secondary border border-border">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-            <div>
-              <p className="text-[11px] uppercase tracking-wider text-primary font-semibold">Sparkassen City Wallet</p>
-              <h1 className="font-display font-extrabold text-lg text-foreground">Merchant Dashboard</h1>
-            </div>
+const Merchant = () => (
+  <MerchantShell title="Merchant Mode">
+      <Card>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h2 className="font-display font-bold text-base text-foreground">Current goal</h2>
+            <p className="mt-1 font-display text-lg font-extrabold text-foreground">{merchant.goal}</p>
+            <p className="mt-1 text-sm text-muted-foreground">AI generates offers only within your guardrails.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5">
-              <span className="h-2 w-2 rounded-full bg-success animate-pulse-dot" />
-              <span className="text-xs font-semibold text-foreground">Café Mitte · Live</span>
+          <Link to="/merchant/goal" className="shrink-0 rounded-xl border border-border bg-card px-2.5 py-1.5 text-xs font-bold text-foreground">
+            Change goal
+          </Link>
+        </div>
+        <div className="mt-3 space-y-1.5 text-xs font-bold text-foreground">
+          <p>{merchant.timeWindow} · Max {merchant.maxDiscount} · {merchant.radius} radius</p>
+          <p>{merchant.products} · {merchant.tone}</p>
+        </div>
+      </Card>
+
+      <Card className="border-primary/15">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-display font-bold text-base text-foreground">Active AI offer</h2>
+          <span className="rounded-full bg-success/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-success">
+            Ready to activate
+          </span>
+        </div>
+        <p className="mt-2 font-display text-lg font-extrabold text-foreground">{merchant.offerTitle}</p>
+        <p className="mt-1 text-sm font-bold text-primary">{merchant.offerDetail} · {merchant.shortValidity}</p>
+        <div className="mt-3 rounded-xl bg-secondary/60 p-2.5">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Why now</p>
+          <p className="mt-1 text-xs font-semibold text-foreground">Overcast, 9°C · demand shifting · quiet window</p>
+        </div>
+        <Link to="/merchant/review" className="mt-3 block rounded-xl border border-border bg-card py-2.5 text-center text-sm font-display font-bold text-foreground">
+          Review offer
+        </Link>
+      </Card>
+
+      <Card>
+        <h2 className="font-display font-bold text-base text-foreground">Results today</h2>
+        <p className="mt-2 text-sm font-bold text-foreground">shown · 5 redeemed · €61.40 revenue</p>
+        <div className="mt-3 border-t border-border pt-3">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Latest redemptions</p>
+          <div className="mt-2 space-y-1.5">
+            <div className="flex items-center justify-between text-sm font-semibold text-foreground">
+              <span><span className="text-muted-foreground">18:28</span> · Coffee Rescue</span>
+              <span className="text-success">$6.87</span>
             </div>
-            <div className="h-9 w-9 rounded-full bg-gradient-card text-primary-foreground grid place-items-center text-sm font-bold">CM</div>
+            <div className="flex items-center justify-between text-sm font-semibold text-foreground">
+              <span><span className="text-muted-foreground">17:41</span> · Lunch Deal</span>
+              <span className="text-success">$11.61</span>
+            </div>
           </div>
         </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-6 lg:px-10 py-6 lg:py-8 grid lg:grid-cols-3 gap-6">
-        {/* Left: KPIs + Builder */}
-        <section className="lg:col-span-2 space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <KPI icon={<Sparkles className="h-4 w-4" />} label="Offers generated" value={merchantAnalytics.offersGenerated.toString()} trend="+12%" />
-            <KPI icon={<Target className="h-4 w-4" />} label="Conversion" value={`${merchantAnalytics.conversionRate}%`} trend="+3.4pp" />
-            <KPI icon={<Receipt className="h-4 w-4" />} label="Redemptions" value={merchantAnalytics.redemptions.toString()} trend="+8" />
-            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Incr. revenue" value={locale.formatPrice(merchantAnalytics.incrementalRevenue)} trend={`+${locale.formatPrice(240)}`} />
-          </div>
-
-          <div className="rounded-3xl bg-card border border-border shadow-elev-sm p-6">
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h2 className="font-display font-bold text-lg text-foreground">Offer rules</h2>
-                <p className="text-xs text-muted-foreground">AI generates the actual offer. You set the guardrails.</p>
-              </div>
-              <button className="text-xs font-semibold text-primary flex items-center gap-1"><RefreshCw className="h-3 w-3" /> Reset</button>
-            </div>
-
-            <div className="mb-5 rounded-2xl bg-primary/5 border border-primary/15 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">Live signal stack feeding the AI</p>
-              <div className="mt-2 grid md:grid-cols-3 gap-2 text-xs">
-                <Signal label="Weather" value={`${weather.weather}, ${weather.tempC}C`} />
-                <Signal label="Demand" value={liveDemand.label} />
-                <Signal
-                  label={`Local event · ${events.signal.source === "ticketmaster" ? "Ticketmaster" : events.isRealtime ? "OSM" : "pattern"}`}
-                  value={liveEvent}
-                />
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-5">
-              <Field icon={<Target className="h-4 w-4" />} label="Goal">
-                <ChipGroup options={goals} value={goal} onChange={setGoal} />
-              </Field>
-
-              <Field icon={<Tag className="h-4 w-4" />} label={`Max discount · ${maxDiscount}%`}>
-                <input
-                  type="range" min={5} max={40} step={5}
-                  value={maxDiscount} onChange={e => setMaxDiscount(+e.target.value)}
-                  className="w-full accent-primary"
-                />
-                <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>5%</span><span>40%</span></div>
-              </Field>
-
-              <Field icon={<Clock className="h-4 w-4" />} label="Slow hours">
-                <div className="flex items-center gap-2">
-                  <TimeInput value={slowFrom} onChange={setSlowFrom} />
-                  <span className="text-muted-foreground">–</span>
-                  <TimeInput value={slowTo} onChange={setSlowTo} />
-                </div>
-              </Field>
-
-              <Field icon={<Sparkles className="h-4 w-4" />} label="Inventory focus">
-                <ChipGroup options={inventories} value={inventory} onChange={setInventory} />
-              </Field>
-
-              <Field icon={<MapPin className="h-4 w-4" />} label={`Target radius · ${radius}m`}>
-                <input
-                  type="range" min={200} max={2000} step={100}
-                  value={radius} onChange={e => setRadius(+e.target.value)}
-                  className="w-full accent-primary"
-                />
-                <div className="flex justify-between text-[10px] text-muted-foreground mt-1"><span>200m</span><span>2km</span></div>
-              </Field>
-
-              <Field icon={<Palette className="h-4 w-4" />} label="Brand tone">
-                <ChipGroup options={tones} value={tone} onChange={setTone} />
-              </Field>
-            </div>
-          </div>
-
-          <div className="rounded-3xl bg-card border border-border shadow-elev-sm p-6">
-            <h2 className="font-display font-bold text-lg text-foreground mb-4">Performance · This week</h2>
-            <div className="flex items-end gap-3 h-48">
-              {merchantAnalytics.weeklyData.map(d => {
-                const max = 50;
-                return (
-                  <div key={d.day} className="flex-1 flex flex-col items-center gap-2">
-                    <div className="w-full flex items-end gap-1 h-40">
-                      <div className="flex-1 bg-primary/15 rounded-t-md" style={{ height: `${(d.offers / max) * 100}%` }} />
-                      <div className="flex-1 bg-primary rounded-t-md" style={{ height: `${(d.redemptions / max) * 100}%` }} />
-                    </div>
-                    <span className="text-xs font-medium text-muted-foreground">{d.day}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-primary/15" />Offers shown</span>
-              <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-primary" />Redemptions</span>
-            </div>
-          </div>
-
-          <div className="rounded-3xl bg-card border border-border shadow-elev-sm p-6">
-            <h2 className="font-display font-bold text-lg text-foreground mb-1">Live redemption feed</h2>
-            <p className="text-xs text-muted-foreground mb-4">Simulated checkouts appear here as customers redeem generated offers.</p>
-            <div className="space-y-2">
-              {recentRedemptions.map((item) => (
-                <div key={item.id} className="flex items-center justify-between gap-3 rounded-2xl bg-secondary/60 p-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{item.merchant}</p>
-                    <p className="text-xs text-muted-foreground truncate">{item.label} · {item.time}</p>
-                  </div>
-                  <span className="text-sm font-bold text-success">{locale.formatPrice(Math.abs(item.amount))}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Right: Live Preview */}
-        <aside className="space-y-4">
-          <div className="rounded-3xl bg-card border border-border shadow-elev-sm p-5 sticky top-24">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-1.5">
-                <Eye className="h-4 w-4 text-primary" />
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">AI Live Preview</p>
-              </div>
-              <span className="text-[10px] font-semibold text-success bg-success/10 px-2 py-0.5 rounded-full">Updating</span>
-            </div>
-            <p className="text-xs text-muted-foreground mb-4">As it appears in customer wallets within {radius}m.</p>
-
-            {/* Mock phone */}
-            <div className="rounded-3xl bg-gradient-hero p-3 border border-border">
-              <div className="rounded-2xl bg-card border border-border p-4 shadow-elev-sm">
-                <div className="flex items-start gap-3">
-                  <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 grid place-items-center text-2xl">☕</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Café Mitte</p>
-                        <h3 className="font-display font-bold text-[15px] leading-tight text-foreground mt-0.5">{preview.title}</h3>
-                      </div>
-                      <div className="rounded-xl bg-primary/10 text-primary px-2.5 py-1 text-sm font-bold">-{maxDiscount}%</div>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1.5">{preview.subtitle}</p>
-                    <div className="mt-2.5 flex items-center gap-3 text-[11px] text-muted-foreground font-medium">
-                      <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{radius}m radius</span>
-                      <span className="flex items-center gap-1 text-warning"><Clock className="h-3 w-3" />{preview.window}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-3 pt-3 border-t border-border flex items-start gap-2">
-                  <Sparkles className="h-3.5 w-3.5 text-primary flex-shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    <span className="font-semibold text-foreground">Why now: </span>{preview.whyNow.join(" · ")}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-2 text-xs">
-              <Row label="Goal" value={goal} />
-              <Row label="Window" value={preview.window} />
-              <Row label="Tone" value={tone} />
-              <Row label="Demand signal" value={liveDemand.level} />
-              <Row label="Event source" value={eventSourceLabel(events.signal.source)} />
-            </div>
-
-            <button className="mt-5 w-full rounded-2xl bg-primary text-primary-foreground py-3 font-display font-bold text-sm hover:bg-primary-deep transition-base">
-              Activate offer
-            </button>
-            <p className="text-[10px] text-muted-foreground text-center mt-2">Customers in radius will see this within ~30 seconds</p>
-          </div>
-        </aside>
-      </main>
-    </div>
-  );
-};
-
-const Field = ({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) => (
-  <div>
-    <div className="flex items-center gap-1.5 text-foreground mb-2">
-      <span className="text-primary">{icon}</span>
-      <label className="text-xs font-semibold uppercase tracking-wider">{label}</label>
-    </div>
-    {children}
-  </div>
-);
-
-const ChipGroup = ({ options, value, onChange }: { options: string[]; value: string; onChange: (v: string) => void }) => (
-  <div className="flex flex-wrap gap-1.5">
-    {options.map(o => (
-      <button key={o} onClick={() => onChange(o)} className={cn(
-        "px-3 py-1.5 rounded-full text-xs font-semibold border transition-base",
-        value === o ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:border-primary/50"
-      )}>{o}</button>
-    ))}
-  </div>
-);
-
-const TimeInput = ({ value, onChange }: { value: number; onChange: (n: number) => void }) => (
-  <select value={value} onChange={e => onChange(+e.target.value)} className="rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground">
-    {Array.from({ length: 24 }, (_, i) => i).map(h => <option key={h} value={h}>{h}:00</option>)}
-  </select>
-);
-
-const KPI = ({ icon, label, value, trend }: { icon: React.ReactNode; label: string; value: string; trend: string }) => (
-  <div className="rounded-2xl bg-card border border-border p-4 shadow-elev-sm">
-    <div className="flex items-center justify-between">
-      <span className="h-8 w-8 grid place-items-center rounded-lg bg-primary/10 text-primary">{icon}</span>
-      <span className="text-[10px] font-semibold text-success">{trend}</span>
-    </div>
-    <p className="font-display font-extrabold text-2xl text-foreground mt-2">{value}</p>
-    <p className="text-[11px] text-muted-foreground">{label}</p>
-  </div>
-);
-
-const Row = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex items-center justify-between gap-2">
-    <span className="text-muted-foreground">{label}</span>
-    <span className="font-semibold text-foreground truncate">{value}</span>
-  </div>
-);
-
-const Signal = ({ label, value }: { label: string; value: string }) => (
-  <div className="rounded-xl bg-card border border-border p-3">
-    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-    <p className="mt-1 font-semibold text-foreground line-clamp-2">{value}</p>
-  </div>
+      </Card>
+  </MerchantShell>
 );
 
 export default Merchant;

@@ -1,0 +1,764 @@
+{
+  "capturedAt": "2026-04-25T21:52:01.501Z",
+  "purpose": "Frozen live-context snapshot for demo recording.",
+  "note": "API keys are not stored in this file.",
+  "status": {
+    "weather": "ok",
+    "nearbyPlaces": "ok via Nominatim fallback",
+    "osmEvents": "Overpass unavailable; Ticketmaster event context saved",
+    "ticketmaster": "ok"
+  },
+  "location": {
+    "geo": {
+      "lat": 42.3601,
+      "lng": -71.0589
+    },
+    "district": "Boston",
+    "city": "Boston",
+    "country": "United States",
+    "currency": "USD"
+  },
+  "weather": {
+    "raw": {
+      "latitude": 42.365166,
+      "longitude": -71.0618,
+      "generationtime_ms": 0.08118152618408203,
+      "utc_offset_seconds": -14400,
+      "timezone": "America/New_York",
+      "timezone_abbreviation": "GMT-4",
+      "elevation": 9,
+      "current_units": {
+        "time": "iso8601",
+        "interval": "seconds",
+        "temperature_2m": "°C",
+        "weather_code": "wmo code",
+        "is_day": ""
+      },
+      "current": {
+        "time": "2026-04-25T17:45",
+        "interval": 900,
+        "temperature_2m": 9.2,
+        "weather_code": 3,
+        "is_day": 1
+      }
+    },
+    "normalized": {
+      "weather": "Overcast",
+      "weatherEmoji": "☁️",
+      "tempC": 9,
+      "dayLabel": "Saturday afternoon",
+      "time": "05:45 PM",
+      "period": "Afternoon"
+    }
+  },
+  "ticketmaster": {
+    "enabled": true,
+    "totalElements": 1271,
+    "events": [
+      {
+        "name": "Causeway Card Show",
+        "url": "https://www.ticketmaster.com/causeway-card-show-boston-massachusetts-04-25-2026/event/010064507F9D4C93",
+        "startsAt": "2026-04-25T13:00:00Z",
+        "venue": "Big Night Live",
+        "classifications": [
+          "Miscellaneous / Hobby/Special Interest Expos / Hobby/Special Interest Expos"
+        ]
+      },
+      {
+        "name": "Disney's Beauty and the Beast (Touring)",
+        "url": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-boston-massachusetts-04-25-2026/event/01006350B735CC2C",
+        "startsAt": "2026-04-25T18:00:00Z",
+        "venue": "Citizens Opera House",
+        "classifications": [
+          "Arts & Theatre / Theatre / Musical"
+        ]
+      },
+      {
+        "name": "School of Rock Watertown",
+        "url": "https://www.ticketweb.com/event/school-of-rock-watertown-middle-east-upstairs-tickets/14859873",
+        "startsAt": "2026-04-25T20:00:00Z",
+        "venue": "Middle East - Upstairs",
+        "classifications": [
+          "Music / Other"
+        ]
+      },
+      {
+        "name": "AZÚ",
+        "url": "https://www.ticketweb.com/event/az-middle-east-cornerbakery-tickets/14870853",
+        "startsAt": "2026-04-25T21:00:00Z",
+        "venue": "Middle East - Corner/Bakery",
+        "classifications": [
+          "Music / Jazz / Jazz"
+        ]
+      },
+      {
+        "name": "Kathleen Madigan: The Day Drinking Tour",
+        "url": "https://www.ticketmaster.com/kathleen-madigan-the-day-drinking-tour-boston-massachusetts-04-25-2026/event/0100631BA997422D",
+        "startsAt": "2026-04-25T23:00:00Z",
+        "venue": "The Wilbur",
+        "classifications": [
+          "Arts & Theatre / Comedy / Comedy"
+        ]
+      },
+      {
+        "name": "Nettspend - early life crisis",
+        "url": "https://www.ticketmaster.com/nettspend-early-life-crisis-boston-massachusetts-04-25-2026/event/0100644CD9502B52",
+        "startsAt": "2026-04-25T23:00:00Z",
+        "venue": "Citizens House of Blues Boston",
+        "classifications": [
+          "Music / Hip-Hop/Rap / Trap"
+        ]
+      },
+      {
+        "name": "Against All Authority,  Direct Hit, Hell Beach",
+        "url": "https://www.ticketweb.com/event/against-all-authority-direct-middle-east-downstairs-tickets/14103284",
+        "startsAt": "2026-04-25T23:00:00Z",
+        "venue": "Middle East - Downstairs",
+        "classifications": [
+          "Music / Alternative / Alternative Rock",
+          "Music / Rock / Hardcore Punk",
+          "Music / Rock / Hardcore Punk"
+        ]
+      },
+      {
+        "name": "SUEDE",
+        "url": "https://www.ticketweb.com/event/suede-scullers-jazz-club-tickets/14078174",
+        "startsAt": "2026-04-25T23:00:00Z",
+        "venue": "Scullers Jazz Club",
+        "classifications": [
+          "Music / Jazz / Jazz"
+        ]
+      },
+      {
+        "name": "Stifel Stars on Ice Pre-Show Stargazer Pass",
+        "url": "https://www.ticketmaster.com/stifel-stars-on-ice-preshow-stargazer-boston-massachusetts-04-25-2026/event/01006357F331E59E",
+        "startsAt": "2026-04-25T23:00:00Z",
+        "venue": "Agganis Arena",
+        "classifications": [
+          "Miscellaneous / Undefined / Undefined"
+        ]
+      },
+      {
+        "name": "Stifel Stars on Ice - U.S.",
+        "url": "https://www.ticketmaster.com/stifel-stars-on-ice-us-boston-massachusetts-04-25-2026/event/01006357E22CDBB2",
+        "startsAt": "2026-04-25T23:00:00Z",
+        "venue": "Agganis Arena",
+        "classifications": [
+          "Miscellaneous / Ice Shows / Ice Shows"
+        ]
+      }
+    ]
+  },
+  "eventSignal": {
+    "label": "1271 scheduled events nearby, next: Causeway Card Show",
+    "source": "ticketmaster",
+    "nearbyCount": 1271,
+    "eventName": "Causeway Card Show",
+    "venueName": "Big Night Live",
+    "startsAt": "2026-04-25T13:00:00Z"
+  },
+  "osmEventVenues": {
+    "rawCount": 0,
+    "normalized": []
+  },
+  "nearbyPlaces": {
+    "rawCount": 30,
+    "normalized": [
+      {
+        "id": "nominatim-361984093",
+        "name": "Blackstone Grill",
+        "category": "Lunch",
+        "address": "Blackstone Grill, Freedom Trail, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States",
+        "lat": 42.360863,
+        "lng": -71.0568001,
+        "distanceM": 192,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-362539972",
+        "name": "Sons of Boston",
+        "category": "Lunch",
+        "address": "Sons of Boston, Freedom Trail, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States",
+        "lat": 42.3609194,
+        "lng": -71.056805,
+        "distanceM": 195,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-336147252",
+        "name": "Samuel Adams Taproom",
+        "category": "Café",
+        "address": "Samuel Adams Taproom, 60, State Street, Dock Square, Downtown, Boston, Suffolk County, Massachusetts, 02109, United States",
+        "lat": 42.3596782,
+        "lng": -71.056579,
+        "distanceM": 196,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-358386989",
+        "name": "Union Oyster House",
+        "category": "Lunch",
+        "address": "Union Oyster House, Freedom Trail, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States",
+        "lat": 42.3612749,
+        "lng": -71.0569532,
+        "distanceM": 207,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-335066998",
+        "name": "The Alley Bar",
+        "category": "Café",
+        "address": "The Alley Bar, 14, Pi Alley, Downtown Crossing, Downtown, Boston, Suffolk County, Massachusetts, 02108, United States",
+        "lat": 42.3581085,
+        "lng": -71.0587158,
+        "distanceM": 222,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-334921910",
+        "name": "The Green Dragon Tavern",
+        "category": "Café",
+        "address": "The Green Dragon Tavern, 11, Marshall Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02108, United States",
+        "lat": 42.3615079,
+        "lng": -71.0568617,
+        "distanceM": 229,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-332995090",
+        "name": "The Point",
+        "category": "Café",
+        "address": "The Point, 55, Union Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States",
+        "lat": 42.3617656,
+        "lng": -71.0569604,
+        "distanceM": 244,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-364453001",
+        "name": "Salty Dog",
+        "category": "Lunch",
+        "address": "Salty Dog, South Market Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02109, United States",
+        "lat": 42.3599975,
+        "lng": -71.05565,
+        "distanceM": 267,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-361577078",
+        "name": "Bertucci's",
+        "category": "Lunch",
+        "address": "Bertucci's, Merchants Row, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02102, United States",
+        "lat": 42.3593838,
+        "lng": -71.0557717,
+        "distanceM": 269,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-331329260",
+        "name": "Scholar's Bistro",
+        "category": "Café",
+        "address": "Scholar's Bistro, 25, School Street, Downtown Crossing, Downtown, Boston, Suffolk County, Massachusetts, 02102, United States",
+        "lat": 42.3576641,
+        "lng": -71.0590082,
+        "distanceM": 271,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-362269722",
+        "name": "Anthem",
+        "category": "Lunch",
+        "address": "Anthem, Chatham Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02102, United States",
+        "lat": 42.3596962,
+        "lng": -71.0555877,
+        "distanceM": 276,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-360266565",
+        "name": "Salty Dog Seafood Grille & Bar",
+        "category": "Lunch",
+        "address": "Salty Dog Seafood Grille & Bar, 206, South Market Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02109, United States",
+        "lat": 42.3602616,
+        "lng": -71.0554773,
+        "distanceM": 282,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-335176829",
+        "name": "Bruegger's Bagels",
+        "category": "Bakery",
+        "address": "Bruegger's Bagels, 7, School Street, Downtown Crossing, Downtown, Boston, Suffolk County, Massachusetts, 02108, United States",
+        "lat": 42.3575444,
+        "lng": -71.0585756,
+        "distanceM": 285,
+        "source": "nominatim",
+        "rawType": "bakery"
+      },
+      {
+        "id": "nominatim-359615699",
+        "name": "Clarke's",
+        "category": "Lunch",
+        "address": "Clarke's, Chatham Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02102, United States",
+        "lat": 42.3594624,
+        "lng": -71.0554695,
+        "distanceM": 291,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-361905573",
+        "name": "Zo Greek",
+        "category": "Lunch",
+        "address": "Zo Greek, Merchants Row, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02102, United States",
+        "lat": 42.3592336,
+        "lng": -71.0554274,
+        "distanceM": 301,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-360111400",
+        "name": "Boston Chowda",
+        "category": "Lunch",
+        "address": "Boston Chowda, 30, River Street, Beacon Hill, Boston, Suffolk County, Massachusetts, 01832, United States",
+        "lat": 42.3601194,
+        "lng": -71.0552111,
+        "distanceM": 303,
+        "source": "nominatim",
+        "rawType": "restaurant"
+      },
+      {
+        "id": "nominatim-335278274",
+        "name": "Lou Lou",
+        "category": "Bakery",
+        "address": "Lou Lou, 294, Washington Street, Downtown Crossing, Downtown, Boston, Suffolk County, Massachusetts, 02102, United States",
+        "lat": 42.357284,
+        "lng": -71.0583041,
+        "distanceM": 317,
+        "source": "nominatim",
+        "rawType": "bakery"
+      },
+      {
+        "id": "nominatim-333931008",
+        "name": "Emmet's",
+        "category": "Café",
+        "address": "Emmet's, 6, Beacon Street, Downtown Crossing, Downtown, Boston, Suffolk County, Massachusetts, 02108, United States",
+        "lat": 42.358149,
+        "lng": -71.0617226,
+        "distanceM": 318,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-336057386",
+        "name": "Hub Pub",
+        "category": "Café",
+        "address": "Hub Pub, 18, Province Street, Downtown Crossing, Downtown, Boston, Suffolk County, Massachusetts, 02108, United States",
+        "lat": 42.3571718,
+        "lng": -71.0596569,
+        "distanceM": 331,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-333545653",
+        "name": "Grand Canal",
+        "category": "Café",
+        "address": "Grand Canal, 57, Canal Street, West End, Boston, Suffolk County, Massachusetts, 02114, United States",
+        "lat": 42.3638369,
+        "lng": -71.0591047,
+        "distanceM": 416,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-334633924",
+        "name": "Modern Pastry",
+        "category": "Bakery",
+        "address": "Modern Pastry, Hanover Street, Government Center/Faneuil Hall, North End, Boston, Suffolk County, Massachusetts, 02113, United States",
+        "lat": 42.3632657,
+        "lng": -71.0547881,
+        "distanceM": 488,
+        "source": "nominatim",
+        "rawType": "bakery"
+      },
+      {
+        "id": "nominatim-335428423",
+        "name": "Coogan‘s",
+        "category": "Café",
+        "address": "Coogan‘s, 171, Milk Street, Waterfront, Downtown, Boston, Suffolk County, Massachusetts, 02109, United States",
+        "lat": 42.3583073,
+        "lng": -71.053295,
+        "distanceM": 502,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-335383266",
+        "name": "Mr. Dooley's",
+        "category": "Café",
+        "address": "Mr. Dooley's, 77, Broad Street, Waterfront, Downtown, Boston, Suffolk County, Massachusetts, 02109, United States",
+        "lat": 42.3576683,
+        "lng": -71.0535739,
+        "distanceM": 514,
+        "source": "nominatim",
+        "rawType": "pub"
+      },
+      {
+        "id": "nominatim-430927951",
+        "name": "Fuful Bakery",
+        "category": "Bakery",
+        "address": "Fuful Bakery, 274, Franklin Street, Waterfront, Downtown, Boston, Suffolk County, Massachusetts, 02110, United States",
+        "lat": 42.3569425,
+        "lng": -71.053606,
+        "distanceM": 559,
+        "source": "nominatim",
+        "rawType": "bakery"
+      },
+      {
+        "id": "nominatim-333646017",
+        "name": "Bova's Bakery",
+        "category": "Bakery",
+        "address": "Bova's Bakery, 134, Salem Street, Government Center/Faneuil Hall, North End, Boston, Suffolk County, Massachusetts, 02113, United States",
+        "lat": 42.3651955,
+        "lng": -71.0555868,
+        "distanceM": 629,
+        "source": "nominatim",
+        "rawType": "bakery"
+      },
+      {
+        "id": "nominatim-334349679",
+        "name": "Bakey",
+        "category": "Bakery",
+        "address": "Bakey, 151, Tremont Street, Downtown, Boston, Suffolk County, Massachusetts, 02108, United States",
+        "lat": 42.3545247,
+        "lng": -71.0634501,
+        "distanceM": 724,
+        "source": "nominatim",
+        "rawType": "bakery"
+      },
+      {
+        "id": "nominatim-335277289",
+        "name": "Tatte",
+        "category": "Bakery",
+        "address": "Tatte, 125, Summer Street, Church Green, Downtown, Boston, Suffolk County, Massachusetts, 02111, United States",
+        "lat": 42.3532095,
+        "lng": -71.0572844,
+        "distanceM": 778,
+        "source": "nominatim",
+        "rawType": "bakery"
+      },
+      {
+        "id": "nominatim-333903262",
+        "name": "Ho Yuen Bakery 家餅園桃",
+        "category": "Bakery",
+        "address": "Ho Yuen Bakery 家餅園桃, 54, Beach Street, Chinatown, Boston, Suffolk County, Massachusetts, 02111, United States",
+        "lat": 42.3514769,
+        "lng": -71.0606021,
+        "distanceM": 969,
+        "source": "nominatim",
+        "rawType": "bakery"
+      },
+      {
+        "id": "nominatim-419938156",
+        "name": "Taiwan Bakery 聚樂惜悟",
+        "category": "Bakery",
+        "address": "Taiwan Bakery 聚樂惜悟, 56, Beach Street, Chinatown, Boston, Suffolk County, Massachusetts, 02111, United States",
+        "lat": 42.3514441,
+        "lng": -71.0605245,
+        "distanceM": 972,
+        "source": "nominatim",
+        "rawType": "bakery"
+      },
+      {
+        "id": "nominatim-335571272",
+        "name": "Corner Cafe Bakery",
+        "category": "Bakery",
+        "address": "Corner Cafe Bakery, 62, Harrison Avenue, Chinatown, Boston, Suffolk County, Massachusetts, 02111, United States",
+        "lat": 42.3513847,
+        "lng": -71.0610813,
+        "distanceM": 986,
+        "source": "nominatim",
+        "rawType": "bakery"
+      }
+    ],
+    "provider": "nominatim-search-fallback"
+  },
+  "generatedOffers": [
+    {
+      "id": "nominatim-361984093",
+      "merchant": "Blackstone Grill",
+      "category": "Lunch",
+      "title": "Local Lunch Deal",
+      "subtitle": "A nearby food spot for right now",
+      "discount": 10,
+      "originalPrice": 7.4,
+      "finalPrice": 6.66,
+      "distanceM": 192,
+      "distanceLabel": "192m",
+      "expiresInMin": 38,
+      "address": "Blackstone Grill, Freedom Trail, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States",
+      "geo": {
+        "lat": 42.360863,
+        "lng": -71.0568001
+      },
+      "emoji": "🍲",
+      "score": 82,
+      "scoreLabel": "Best match",
+      "source": "snapshot",
+      "eventSource": "ticketmaster",
+      "localEvent": "1271 scheduled events nearby, next: Causeway Card Show",
+      "whyNow": [
+        "192m from you",
+        "Overcast, 9C",
+        "1271 scheduled events nearby, next: Causeway Card Show"
+      ]
+    },
+    {
+      "id": "nominatim-362539972",
+      "merchant": "Sons of Boston",
+      "category": "Lunch",
+      "title": "Local Lunch Deal",
+      "subtitle": "A nearby food spot for right now",
+      "discount": 15,
+      "originalPrice": 9,
+      "finalPrice": 7.65,
+      "distanceM": 195,
+      "distanceLabel": "195m",
+      "expiresInMin": 47,
+      "address": "Sons of Boston, Freedom Trail, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States",
+      "geo": {
+        "lat": 42.3609194,
+        "lng": -71.056805
+      },
+      "emoji": "🍲",
+      "score": 82,
+      "scoreLabel": "Best match",
+      "source": "snapshot",
+      "eventSource": "ticketmaster",
+      "localEvent": "1271 scheduled events nearby, next: Causeway Card Show",
+      "whyNow": [
+        "195m from you",
+        "Overcast, 9C",
+        "1271 scheduled events nearby, next: Causeway Card Show"
+      ]
+    },
+    {
+      "id": "nominatim-336147252",
+      "merchant": "Samuel Adams Taproom",
+      "category": "Café",
+      "title": "Nearby Coffee Break",
+      "subtitle": "A real café close to you",
+      "discount": 20,
+      "originalPrice": 12.5,
+      "finalPrice": 10,
+      "distanceM": 196,
+      "distanceLabel": "196m",
+      "expiresInMin": 55,
+      "address": "Samuel Adams Taproom, 60, State Street, Dock Square, Downtown, Boston, Suffolk County, Massachusetts, 02109, United States",
+      "geo": {
+        "lat": 42.3596782,
+        "lng": -71.056579
+      },
+      "emoji": "☕",
+      "score": 82,
+      "scoreLabel": "Best match",
+      "source": "snapshot",
+      "eventSource": "ticketmaster",
+      "localEvent": "1271 scheduled events nearby, next: Causeway Card Show",
+      "whyNow": [
+        "196m from you",
+        "Overcast, 9C",
+        "1271 scheduled events nearby, next: Causeway Card Show"
+      ]
+    },
+    {
+      "id": "nominatim-358386989",
+      "merchant": "Union Oyster House",
+      "category": "Lunch",
+      "title": "Local Lunch Deal",
+      "subtitle": "A nearby food spot for right now",
+      "discount": 25,
+      "originalPrice": 14.8,
+      "finalPrice": 11.1,
+      "distanceM": 207,
+      "distanceLabel": "207m",
+      "expiresInMin": 68,
+      "address": "Union Oyster House, Freedom Trail, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States",
+      "geo": {
+        "lat": 42.3612749,
+        "lng": -71.0569532
+      },
+      "emoji": "🍲",
+      "score": 81,
+      "scoreLabel": "Best match",
+      "source": "snapshot",
+      "eventSource": "ticketmaster",
+      "localEvent": "1271 scheduled events nearby, next: Causeway Card Show",
+      "whyNow": [
+        "207m from you",
+        "Overcast, 9C",
+        "1271 scheduled events nearby, next: Causeway Card Show"
+      ]
+    },
+    {
+      "id": "nominatim-335066998",
+      "merchant": "The Alley Bar",
+      "category": "Café",
+      "title": "Nearby Coffee Break",
+      "subtitle": "A real café close to you",
+      "discount": 30,
+      "originalPrice": 10,
+      "finalPrice": 7,
+      "distanceM": 222,
+      "distanceLabel": "222m",
+      "expiresInMin": 82,
+      "address": "The Alley Bar, 14, Pi Alley, Downtown Crossing, Downtown, Boston, Suffolk County, Massachusetts, 02108, United States",
+      "geo": {
+        "lat": 42.3581085,
+        "lng": -71.0587158
+      },
+      "emoji": "☕",
+      "score": 81,
+      "scoreLabel": "Best match",
+      "source": "snapshot",
+      "eventSource": "ticketmaster",
+      "localEvent": "1271 scheduled events nearby, next: Causeway Card Show",
+      "whyNow": [
+        "222m from you",
+        "Overcast, 9C",
+        "1271 scheduled events nearby, next: Causeway Card Show"
+      ]
+    },
+    {
+      "id": "nominatim-334921910",
+      "merchant": "The Green Dragon Tavern",
+      "category": "Café",
+      "title": "Nearby Coffee Break",
+      "subtitle": "A real café close to you",
+      "discount": 12,
+      "originalPrice": 11.5,
+      "finalPrice": 10.12,
+      "distanceM": 229,
+      "distanceLabel": "229m",
+      "expiresInMin": 95,
+      "address": "The Green Dragon Tavern, 11, Marshall Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02108, United States",
+      "geo": {
+        "lat": 42.3615079,
+        "lng": -71.0568617
+      },
+      "emoji": "☕",
+      "score": 81,
+      "scoreLabel": "Best match",
+      "source": "snapshot",
+      "eventSource": "ticketmaster",
+      "localEvent": "1271 scheduled events nearby, next: Causeway Card Show",
+      "whyNow": [
+        "229m from you",
+        "Overcast, 9C",
+        "1271 scheduled events nearby, next: Causeway Card Show"
+      ]
+    },
+    {
+      "id": "nominatim-332995090",
+      "merchant": "The Point",
+      "category": "Café",
+      "title": "Nearby Coffee Break",
+      "subtitle": "A real café close to you",
+      "discount": 18,
+      "originalPrice": 8.5,
+      "finalPrice": 6.97,
+      "distanceM": 244,
+      "distanceLabel": "244m",
+      "expiresInMin": 110,
+      "address": "The Point, 55, Union Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States",
+      "geo": {
+        "lat": 42.3617656,
+        "lng": -71.0569604
+      },
+      "emoji": "☕",
+      "score": 81,
+      "scoreLabel": "Best match",
+      "source": "snapshot",
+      "eventSource": "ticketmaster",
+      "localEvent": "1271 scheduled events nearby, next: Causeway Card Show",
+      "whyNow": [
+        "244m from you",
+        "Overcast, 9C",
+        "1271 scheduled events nearby, next: Causeway Card Show"
+      ]
+    },
+    {
+      "id": "nominatim-364453001",
+      "merchant": "Salty Dog",
+      "category": "Lunch",
+      "title": "Local Lunch Deal",
+      "subtitle": "A nearby food spot for right now",
+      "discount": 22,
+      "originalPrice": 13.2,
+      "finalPrice": 10.3,
+      "distanceM": 267,
+      "distanceLabel": "267m",
+      "expiresInMin": 125,
+      "address": "Salty Dog, South Market Street, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02109, United States",
+      "geo": {
+        "lat": 42.3599975,
+        "lng": -71.05565
+      },
+      "emoji": "🍲",
+      "score": 81,
+      "scoreLabel": "Best match",
+      "source": "snapshot",
+      "eventSource": "ticketmaster",
+      "localEvent": "1271 scheduled events nearby, next: Causeway Card Show",
+      "whyNow": [
+        "267m from you",
+        "Overcast, 9C",
+        "1271 scheduled events nearby, next: Causeway Card Show"
+      ]
+    }
+  ],
+  "recommendedOffer": {
+    "id": "nominatim-361984093",
+    "merchant": "Blackstone Grill",
+    "category": "Lunch",
+    "title": "Local Lunch Deal",
+    "subtitle": "A nearby food spot for right now",
+    "discount": 10,
+    "originalPrice": 7.4,
+    "finalPrice": 6.66,
+    "distanceM": 192,
+    "distanceLabel": "192m",
+    "expiresInMin": 38,
+    "address": "Blackstone Grill, Freedom Trail, Government Center/Faneuil Hall, Downtown, Boston, Suffolk County, Massachusetts, 02201, United States",
+    "geo": {
+      "lat": 42.360863,
+      "lng": -71.0568001
+    },
+    "emoji": "🍲",
+    "score": 82,
+    "scoreLabel": "Best match",
+    "source": "snapshot",
+    "eventSource": "ticketmaster",
+    "localEvent": "1271 scheduled events nearby, next: Causeway Card Show",
+    "whyNow": [
+      "192m from you",
+      "Overcast, 9C",
+      "1271 scheduled events nearby, next: Causeway Card Show"
+    ]
+  },
+  "completedAt": "2026-04-25T21:53:59.938Z"
+}

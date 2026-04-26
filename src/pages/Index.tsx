@@ -1,79 +1,89 @@
 import { MobileShell } from "@/components/MobileShell";
-import { WalletCard } from "@/components/WalletCard";
 import { CityContextCard } from "@/components/CityContextCard";
 import { OfferCard } from "@/components/OfferCard";
-import { user } from "@/data/mock";
-import { ArrowDownToLine, ArrowUpFromLine, Send, Plus, Bell, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLocalizedOffers } from "@/hooks/useLocalizedOffers";
+import { useEffect, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
+import {
+  filterOffersByDirectory,
+  homeOfferDirectoryFilters,
+  type OfferDirectoryFilter,
+} from "@/lib/offerDirectory";
 
 const Index = () => {
+  const [active, setActive] = useState<OfferDirectoryFilter>("All");
+  const [now, setNow] = useState(() => new Date());
   const { offers, isLoading, isRealtime } = useLocalizedOffers();
-  const bestOffer = offers[0];
+  const filteredOffers = filterOffersByDirectory(offers, active);
+  const bestOffer = filteredOffers[0];
+  const greeting = useMemo(() => {
+    const hour = now.getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  }, [now]);
+  const momentLabel = useMemo(() => {
+    const hour = now.getHours();
+    if (hour < 12) return "morning";
+    if (hour < 17) return "afternoon";
+    return "evening";
+  }, [now]);
+
+  useEffect(() => {
+    const tick = window.setInterval(() => setNow(new Date()), 15_000);
+    return () => window.clearInterval(tick);
+  }, []);
+
   return (
     <MobileShell>
-      <header className="px-5 pt-12 pb-4 flex items-center justify-between">
-        <div>
-          <p className="text-xs text-muted-foreground font-medium">Guten Tag,</p>
-          <h1 className="font-display font-extrabold text-xl text-foreground">{user.name.split(" ")[0]}</h1>
-        </div>
-        <button className="relative h-10 w-10 grid place-items-center rounded-full bg-secondary border border-border">
-          <Bell className="h-4 w-4 text-foreground" />
-          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
-        </button>
+      <header className="px-5 pt-12">
+        <h1 className="font-display text-3xl font-extrabold text-foreground">
+          {greeting}, Emily
+        </h1>
       </header>
 
-      <section className="px-5 animate-slide-up">
-        <WalletCard />
-      </section>
-
-      <section className="px-5 mt-5 grid grid-cols-4 gap-2">
-        {[
-          { icon: ArrowDownToLine, label: "Top up" },
-          { icon: Send, label: "Send" },
-          { icon: ArrowUpFromLine, label: "Pay" },
-          { icon: Plus, label: "More" },
-        ].map(({ icon: Icon, label }) => (
-          <button key={label} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl bg-secondary/60 hover:bg-secondary transition-base">
-            <span className="h-9 w-9 grid place-items-center rounded-full bg-card shadow-elev-sm">
-              <Icon className="h-4 w-4 text-primary" />
-            </span>
-            <span className="text-[11px] font-semibold text-foreground">{label}</span>
-          </button>
-        ))}
-      </section>
-
-      <section className="px-5 mt-6 animate-slide-up" style={{ animationDelay: "60ms" }}>
-        <CityContextCard />
+      <section className="px-5 pt-4 animate-slide-up" style={{ animationDelay: "60ms" }}>
+        <CityContextCard featuredOffer={bestOffer} />
       </section>
 
       <section className="px-5 mt-6 animate-slide-up" style={{ animationDelay: "120ms" }}>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <h2 className="font-display font-bold text-[15px] text-foreground">Best offer near you</h2>
-          </div>
-          <Link to="/offers" className="text-xs font-semibold text-primary">
-            {isLoading ? "Finding..." : isRealtime ? "Live places" : "See all"}
+        <div className="flex justify-end mb-3">
+          <Link to="/discover" className="text-xs font-semibold text-primary">
+            {isLoading ? "Finding..." : isRealtime ? "View map" : "See all"}
           </Link>
         </div>
-        {bestOffer && (
-          <div className="mb-3 rounded-2xl border border-primary/15 bg-primary/5 p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">Why this offer now</p>
-            <p className="mt-1 text-xs leading-relaxed text-foreground">
-              {[...bestOffer.whyNow.slice(0, 3), bestOffer.localEvent].filter(Boolean).join(" · ")}
-            </p>
+        <div className="mb-3 flex items-center gap-2 overflow-x-auto scroll-hide">
+          {homeOfferDirectoryFilters.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActive(category)}
+              className={cn(
+                "shrink-0 rounded-full border px-4 py-1.5 text-xs font-semibold transition-base",
+                active === category
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground"
+              )}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+        {!bestOffer && (
+          <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
+            No live matches for {active} right now.
           </div>
         )}
-        <OfferCard offer={bestOffer} />
       </section>
 
-      <section className="px-5 mt-5 animate-slide-up" style={{ animationDelay: "180ms" }}>
-        <h2 className="font-display font-bold text-[15px] text-foreground mb-3">More for your afternoon</h2>
-        <div className="space-y-3">
-          {offers.slice(1, 3).map(o => <OfferCard key={o.id} offer={o} compact />)}
-        </div>
-      </section>
+      {filteredOffers.length > 1 && (
+        <section className="px-5 mt-5 animate-slide-up" style={{ animationDelay: "180ms" }}>
+          <h2 className="font-display font-bold text-[15px] text-foreground mb-3">More for your {momentLabel}</h2>
+          <div className="space-y-3">
+            {filteredOffers.slice(1, 3).map(o => <OfferCard key={o.id} offer={o} compact />)}
+          </div>
+        </section>
+      )}
     </MobileShell>
   );
 };

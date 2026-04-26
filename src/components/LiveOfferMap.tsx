@@ -1,4 +1,3 @@
-import { MobileShell } from "@/components/MobileShell";
 import { offers as fallbackOffers, cityCenter } from "@/data/mock";
 import {
   useEffect,
@@ -106,13 +105,14 @@ const clampMapZoom = (zoom: number) =>
 const isInteractiveElement = (target: EventTarget | null) =>
   target instanceof Element && Boolean(target.closest("a, button"));
 
-const Map = () => {
+export const LiveOfferMap = () => {
   const locale = useLocale();
   const [geo, setGeo] = useState<GeoState>({ status: "idle" });
   const [selectedId, setSelectedId] = useState<string>(fallbackOffers[0].id);
   const { offers: localOffers, isLoading, isRealtime } = useLocalizedOffers();
   const [mapZoom, setMapZoom] = useState(DEFAULT_MAP_ZOOM);
   const [mapCenter, setMapCenter] = useState(cityCenter);
+  const [locationNotice, setLocationNotice] = useState<string | null>(null);
   const dragRef = useRef<{
     pointerId: number;
     startX: number;
@@ -132,7 +132,7 @@ const Map = () => {
         const { latitude, longitude, accuracy } = pos.coords;
         setGeo({ status: "ready", lat: latitude, lng: longitude, accuracy });
         locale.setGeo({ lat: latitude, lng: longitude });
-        toast.success(`Location locked · ±${Math.round(accuracy)}m`);
+        setLocationNotice(`Location locked · ±${Math.round(accuracy)}m`);
       },
       (err) => {
         const denied = err.code === err.PERMISSION_DENIED;
@@ -150,6 +150,12 @@ const Map = () => {
     requestLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!locationNotice) return;
+    const timeout = window.setTimeout(() => setLocationNotice(null), 2000);
+    return () => window.clearTimeout(timeout);
+  }, [locationNotice]);
 
   const userGeo = useMemo(() => {
     if (geo.status === "ready") return { lat: geo.lat, lng: geo.lng };
@@ -211,8 +217,8 @@ const Map = () => {
   };
 
   return (
-    <MobileShell>
-      <div className="relative h-[60vh] bg-secondary overflow-hidden">
+    <>
+      <div className="relative h-[61vh] bg-secondary overflow-hidden">
         <div
           className="absolute left-1/2 top-1/2 h-[600px] w-[400px] -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-[#e5e3df]"
           aria-label="Real street map"
@@ -268,7 +274,6 @@ const Map = () => {
             Recenter
           </button>
 
-          {/* Pins */}
           {localOffers.map((o) => {
             const pointStyle = getPointStyle(mapCenter, o.geo, mapZoom);
             return (
@@ -296,7 +301,6 @@ const Map = () => {
             );
           })}
 
-          {/* User pin */}
           <div
             className="absolute -translate-x-1/2 -translate-y-1/2 transition-spring"
             style={userPointStyle}
@@ -350,6 +354,11 @@ const Map = () => {
             )}
           </button>
         </div>
+        {locationNotice && (
+          <div className="absolute left-1/2 top-28 z-40 -translate-x-1/2 rounded-full bg-card/95 px-3 py-1.5 text-[11px] font-bold text-foreground shadow-elev-md backdrop-blur">
+            {locationNotice}
+          </div>
+        )}
       </div>
 
       <section className="px-5 -mt-6 relative">
@@ -378,7 +387,7 @@ const Map = () => {
               </p>
               {selected.localEvent && (
                 <p className="text-[11px] text-primary font-medium mt-1 line-clamp-1">
-                  Event: {selected.localEvent}
+                  Context signal: {selected.localEvent}
                 </p>
               )}
             </div>
@@ -394,8 +403,6 @@ const Map = () => {
           </Link>
         </div>
       </section>
-    </MobileShell>
+    </>
   );
 };
-
-export default Map;

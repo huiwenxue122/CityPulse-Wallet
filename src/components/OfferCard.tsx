@@ -38,9 +38,6 @@ export const OfferCard = ({ offer, compact = false }: { offer: Offer; compact?: 
               <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-success">
                 {offer.scoreLabel}
               </span>
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-                AI generated {offer.generatedAt ? `at ${offer.generatedAt}` : ""}
-              </span>
             </div>
           )}
 
@@ -53,11 +50,6 @@ export const OfferCard = ({ offer, compact = false }: { offer: Offer; compact?: 
             <span className="flex items-center gap-1 text-warning"><Clock className="h-3 w-3" />{fmtCountdown(offer.expiresInMin)}</span>
           </div>
 
-          {offer.localEvent && (
-            <p className="mt-2 text-[11px] font-medium text-primary line-clamp-1">
-              Event signal: {offer.localEvent}
-            </p>
-          )}
         </div>
       </div>
 

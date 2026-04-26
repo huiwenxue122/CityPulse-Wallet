@@ -81,13 +81,12 @@ const OfferDetail = () => {
         </div>
       </section>
 
-      {(offer.merchantGoal || offer.localEvent || offer.demandPattern) && (
+      {(offer.merchantGoal || offer.demandPattern) && (
         <section className="px-5 mt-5">
           <h3 className="font-display font-bold text-[15px] text-foreground mb-2">AI generation logic</h3>
           <div className="rounded-2xl bg-card border border-border p-4 space-y-2">
             {offer.merchantGoal && <Info icon={<Sparkles className="h-3.5 w-3.5 text-primary" />} label="Merchant goal" value={offer.merchantGoal} />}
             {offer.demandPattern && <Info icon={<Clock className="h-3.5 w-3.5 text-warning" />} label="Demand" value={offer.demandPattern} />}
-            {offer.localEvent && <Info icon={<MapPin className="h-3.5 w-3.5" />} label="Event signal" value={offer.localEvent} />}
           </div>
         </section>
       )}
@@ -125,7 +124,7 @@ const OfferDetail = () => {
           to={`/redeem/${offer.id}`}
           className="block w-full rounded-2xl bg-primary text-primary-foreground py-4 text-center font-display font-bold text-base shadow-elev-md hover:bg-primary-deep transition-base active:scale-[0.99]"
         >
-          Redeem with City Wallet
+          Redeem Now
         </Link>
       </div>
     </MobileShell>

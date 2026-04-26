@@ -1,27 +1,112 @@
 import { MobileShell } from "@/components/MobileShell";
-import { merchantAnalytics } from "@/data/mock";
-import { ArrowDown, ArrowUp, Sparkles, TrendingUp, Receipt, Target } from "lucide-react";
+import { CheckCircle2, Coffee, Film, Landmark, QrCode, Ticket, Train } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { useLocale } from "@/context/LocaleContext";
-import { useActivity } from "@/context/ActivityContext";
+
+type PassTab = "active" | "upcoming" | "used";
+
+type Pass = {
+  id: string;
+  kind: "movie" | "offer" | "transit" | "event" | "used";
+  tab: PassTab;
+  title: string;
+  merchant: string;
+  meta: string;
+  detail: string;
+  icon: React.ReactNode;
+  tone: string;
+};
+
+const passes: Pass[] = [
+  {
+    id: "city-kino",
+    kind: "movie",
+    tab: "active",
+    title: "19:00 movie ticket",
+    merchant: "City Kino Hamburg",
+    meta: "Seat B12 · Ready to scan",
+    detail: "Valid tonight from 18:30",
+    icon: <Film className="h-5 w-5" />,
+    tone: "bg-primary/10 text-primary",
+  },
+  {
+    id: "kaffee-hafen",
+    kind: "offer",
+    tab: "active",
+    title: "15% off hot drink",
+    merchant: "Kaffee Hafen",
+    meta: "Current offer · 900m away",
+    detail: "Show QR before checkout",
+    icon: <Coffee className="h-5 w-5" />,
+    tone: "bg-amber-500/10 text-amber-700",
+  },
+  {
+    id: "tram-pass",
+    kind: "transit",
+    tab: "active",
+    title: "Evening Tram Pass",
+    merchant: "Boston Transit",
+    meta: "Zone 1 · Valid after 18:00",
+    detail: "Tap or show QR at boarding",
+    icon: <Train className="h-5 w-5" />,
+    tone: "bg-success/10 text-success",
+  },
+  {
+    id: "museum-night",
+    kind: "event",
+    tab: "upcoming",
+    title: "Museum Night Entry",
+    merchant: "Museum of Fine Arts",
+    meta: "Starts at 20:30",
+    detail: "QR unlocks 30 minutes before start",
+    icon: <Landmark className="h-5 w-5" />,
+    tone: "bg-purple-500/10 text-purple-700",
+  },
+  {
+    id: "dunkin-used",
+    kind: "used",
+    tab: "used",
+    title: "Lunch Deal",
+    merchant: "Dunkin'",
+    meta: "Used at 12:40",
+    detail: "Receipt saved to pass history",
+    icon: <CheckCircle2 className="h-5 w-5" />,
+    tone: "bg-secondary text-muted-foreground",
+  },
+];
+
+const primaryAction = (pass: Pass) => {
+  if (pass.kind === "offer") {
+    return { label: "Redeem", icon: <Ticket className="h-3.5 w-3.5" /> };
+  }
+  if (pass.kind === "transit") {
+    return { label: "Show pass", icon: <QrCode className="h-3.5 w-3.5" /> };
+  }
+  return { label: "Show QR", icon: <QrCode className="h-3.5 w-3.5" /> };
+};
 
 const Activity = () => {
-  const [tab, setTab] = useState<"wallet" | "analytics">("wallet");
-  const locale = useLocale();
-  const { items } = useActivity();
-  const redeemedItems = items.filter((item) => item.type === "redeemed");
-  const incrementalRevenue = redeemedItems.reduce((sum, item) => sum + Math.abs(item.amount), 0);
+  const [tab, setTab] = useState<PassTab>("active");
+  const visiblePasses = passes.filter((pass) => pass.tab === tab);
+  const scanReadyCount = visiblePasses.filter((pass) =>
+    ["movie", "transit", "event"].includes(pass.kind)
+  ).length;
+  const summary =
+    tab === "active"
+      ? `${visiblePasses.length} active passes · ${scanReadyCount} ready to scan`
+      : tab === "upcoming"
+        ? `${visiblePasses.length} upcoming pass · starts soon`
+        : `${visiblePasses.length} used pass · receipt saved`;
+
   return (
     <MobileShell>
       <header className="px-5 pt-12 pb-3">
-        <h1 className="font-display font-extrabold text-2xl text-foreground">Activity</h1>
-        <p className="text-sm text-muted-foreground">Your wallet & local impact</p>
+        <h1 className="font-display font-extrabold text-2xl text-foreground">My Passes</h1>
       </header>
 
       <div className="px-5">
-        <div className="grid grid-cols-2 gap-1 p-1 bg-secondary rounded-2xl">
-          {(["wallet", "analytics"] as const).map(t => (
+        <div className="grid grid-cols-3 gap-1 p-1 bg-secondary rounded-2xl">
+          {(["active", "upcoming", "used"] as const).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -30,91 +115,50 @@ const Activity = () => {
                 tab === t ? "bg-card text-foreground shadow-elev-sm" : "text-muted-foreground"
               )}
             >
-              {t === "wallet" ? "Wallet" : "Local Impact"}
+              {t === "active" ? "Active" : t === "upcoming" ? "Upcoming" : "Used"}
             </button>
           ))}
         </div>
+        <p className="mt-2 text-xs font-medium text-muted-foreground">{summary}</p>
       </div>
 
-      {tab === "wallet" ? (
-        <section className="mt-5 px-5 space-y-2">
-          {items.map(a => (
-            <div key={a.id} className="flex items-center gap-3 p-3 rounded-2xl bg-card border border-border">
-              <div className={cn(
-                "h-11 w-11 rounded-xl grid place-items-center text-lg flex-shrink-0",
-                a.type === "topup" ? "bg-success/10" : a.type === "offer_generated" ? "bg-primary/10" : "bg-secondary"
-              )}>
-                {a.icon}
+      <section className="mt-5 px-5 space-y-3">
+        {visiblePasses.map((pass) => {
+          const action = primaryAction(pass);
+
+          return (
+          <div key={pass.id} className="rounded-2xl bg-card border border-border p-4 shadow-elev-sm">
+            <div className="flex items-start gap-3">
+              <div className={cn("h-12 w-12 rounded-2xl grid place-items-center flex-shrink-0", pass.tone)}>
+                {pass.icon}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-foreground truncate">{a.label}</p>
-                <p className="text-xs text-muted-foreground truncate">{a.merchant} · {a.time}</p>
-              </div>
-              {a.amount !== 0 && (
-                <p className={cn("font-display font-bold text-sm flex items-center gap-0.5",
-                  a.amount > 0 ? "text-success" : "text-foreground"
-                )}>
-                  {a.amount > 0 ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-                  {locale.formatPrice(Math.abs(a.amount))}
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+                  {pass.merchant}
                 </p>
-              )}
-              {a.amount === 0 && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded-full">AI</span>
-              )}
+                <h3 className="font-display font-bold text-base text-foreground mt-0.5">
+                  {pass.title}
+                </h3>
+                <p className="text-xs font-semibold text-primary mt-1">{pass.meta}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{pass.detail}</p>
+              </div>
             </div>
-          ))}
-        </section>
-      ) : (
-        <section className="mt-5 px-5 space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <KPI icon={<Sparkles className="h-4 w-4" />} label="Offers generated" value={merchantAnalytics.offersGenerated.toString()} trend="+12%" />
-            <KPI icon={<Target className="h-4 w-4" />} label="Conversion" value={`${merchantAnalytics.conversionRate}%`} trend="+3.4pp" />
-            <KPI icon={<Receipt className="h-4 w-4" />} label="Redemptions" value={(merchantAnalytics.redemptions + redeemedItems.length).toString()} trend="+live" />
-            <KPI icon={<TrendingUp className="h-4 w-4" />} label="Revenue" value={locale.formatPrice(merchantAnalytics.incrementalRevenue + incrementalRevenue)} trend={`+${locale.formatPrice(incrementalRevenue)}`} />
-          </div>
 
-          <div className="rounded-2xl bg-card border border-border p-4">
-            <div className="flex items-center justify-between mb-3">
-              <p className="font-display font-bold text-sm text-foreground">This week</p>
-              <p className="text-[11px] text-muted-foreground">Offers vs Redemptions</p>
-            </div>
-            <div className="flex items-end gap-2 h-32">
-              {merchantAnalytics.weeklyData.map(d => {
-                const max = 50;
-                return (
-                  <div key={d.day} className="flex-1 flex flex-col items-center gap-1.5">
-                    <div className="w-full flex items-end gap-0.5 h-24">
-                      <div className="flex-1 bg-primary/15 rounded-t" style={{ height: `${(d.offers / max) * 100}%` }} />
-                      <div className="flex-1 bg-primary rounded-t" style={{ height: `${(d.redemptions / max) * 100}%` }} />
-                    </div>
-                    <span className="text-[10px] font-medium text-muted-foreground">{d.day}</span>
-                  </div>
-                );
-              })}
+            <div className="mt-4 grid grid-cols-[1fr_auto] gap-2">
+              <button className="inline-flex items-center justify-center gap-1 rounded-xl bg-primary text-primary-foreground py-2 text-xs font-bold">
+                {action.icon}
+                {action.label}
+              </button>
+              <button className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-bold text-foreground">
+                Details
+              </button>
             </div>
           </div>
-
-          <div className="rounded-2xl bg-gradient-card text-primary-foreground p-4 shadow-card-premium relative overflow-hidden">
-            <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
-            <p className="text-[11px] uppercase tracking-wider opacity-90 font-semibold relative">Estimated incremental revenue</p>
-            <p className="font-display font-extrabold text-3xl mt-1 relative">{locale.formatPrice(merchantAnalytics.incrementalRevenue)}</p>
-            <p className="text-xs opacity-90 mt-1 relative">attributable to AI-targeted offers this month</p>
-          </div>
-        </section>
-      )}
+          );
+        })}
+      </section>
     </MobileShell>
   );
 };
-
-const KPI = ({ icon, label, value, trend }: { icon: React.ReactNode; label: string; value: string; trend: string }) => (
-  <div className="rounded-2xl bg-card border border-border p-3">
-    <div className="flex items-center justify-between">
-      <span className="h-7 w-7 grid place-items-center rounded-lg bg-primary/10 text-primary">{icon}</span>
-      <span className="text-[10px] font-semibold text-success">{trend}</span>
-    </div>
-    <p className="font-display font-extrabold text-xl text-foreground mt-2">{value}</p>
-    <p className="text-[11px] text-muted-foreground">{label}</p>
-  </div>
-);
 
 export default Activity;
