@@ -1,69 +1,77 @@
 # CityPulse Wallet
 
-Created by **Claire Xue** for the DSV-Gruppe Generative City-Wallet hackathon challenge.
+Created by **Claire Xue** for the DSV-Gruppe **Generative City-Wallet** hackathon challenge.
 
-CityPulse Wallet is an AI-powered city wallet that turns real-time city signals into personalized, wallet-ready local offers.
+CityPulse Wallet is an AI-powered city wallet prototype that connects local city context, merchant goals, and wallet-ready customer offers. The demo shows a full loop: a merchant sets a business goal, an LLM generates a guarded offer, the offer is activated into the customer wallet, the user redeems it, and merchant results update.
 
-Built for the DSV-Gruppe **Generative City-Wallet** hackathon challenge, the project demonstrates how a city wallet can serve both residents and local merchants: users receive relevant offers at the right moment, while merchants set simple business goals and let AI generate safe, localized promotions.
+## Demo Flow
 
-## Demo Entry
-
-Start from:
+Start the app at:
 
 ```txt
-/welcome
+http://localhost:8080/welcome
 ```
 
-From the welcome screen, you can enter:
+Recommended demo path:
 
-- **Customer app**: discover nearby offers, save passes, redeem offers, and explore live city context.
-- **Merchant mode**: set a business goal, adjust guardrails, review an AI-generated offer, and track lightweight results.
+1. Enter **Merchant Mode**.
+2. Open **Goal**, choose the business goal and guardrails, then click **Let AI generate offer**.
+3. Open **Offer**, review the AI-generated copy, reasoning, and guardrail checks, then activate it.
+4. Switch to **Customer Mode**.
+5. On Home, click **Use now** to add the AI offer to the wallet.
+6. Open **Passes**, redeem the active pass.
+7. Return to **Merchant Home** and see redeemed count and revenue update.
 
 ## Product Concept
 
-CityPulse Wallet detects live city context such as:
+CityPulse Wallet turns city signals into timely local actions. Instead of asking merchants to manually write coupons, the merchant only sets intent and constraints:
 
-- Weather changes
-- Nearby activity and demand
-- Location and distance
-- Time-sensitive windows
-- Local merchant goals
+- Goal: fill quiet hours, move inventory, or capture nearby demand.
+- Guardrails: time window, max discount, radius, products, and brand tone.
+- Context: weather, demand signals, nearby activity, distance, and user preferences.
 
-It then converts those signals into one best next action for the user: a relevant local offer that is ready to redeem through the wallet.
+The backend then asks an LLM to generate a structured wallet offer, validates the result with guardrails, and exposes it to the customer app.
 
 ## Key Features
 
 ### Customer Mode
 
-- Premium mobile wallet-style home screen
-- AI-matched hero offer based on live city signals
-- Discover page with real map experience
-- Category filters for local offers
-- Passes page for active, upcoming, and used passes
-- Offer detail and redeem flows
+- Premium mobile wallet home screen with a context-aware hero offer.
+- Discover page with category filters and a live map-style offer surface.
+- Passes page split into Active, Upcoming, and Used wallet items.
+- Two-step wallet behavior: **Use now** adds a pass, **Redeem** consumes it.
+- Customer identity: Claire Xue.
 
 ### Merchant Mode
 
-- Merchant dashboard for a simple business goal
-- Goal setup with selectable chips, time window, discount, and radius controls
-- AI offer review with reasoning and guardrail checks
-- Merchant profile mode
-- Separate merchant bottom navigation: Home, Goal, Offer, Profile
+- Merchant identity: Chloe’s Café.
+- Lightweight merchant control panel with Home, Goal, Offer, and Profile.
+- Goal setup with interactive chips, time window, discount, and radius controls.
+- AI offer review with generated copy, reasoning, and guardrail checks.
+- Results dashboard showing redeemed passes and estimated revenue.
 
-### Live Context and AI Simulation
+### Backend + AI Flow
 
-The app combines live/demo context data with a simulated AI offer engine. It uses structured offer data, weather/context hooks, and local signal scoring to recommend offers in a believable way for a hackathon demo.
+- Minimal Express API under `server/`.
+- In-memory store for hackathon-speed iteration.
+- OpenAI-powered structured offer generation from the backend only.
+- Deterministic fallback generation when `OPENAI_API_KEY` is missing or slow.
+- Guardrail validator that clamps discount and checks product, time, and radius rules.
+- Wallet pass creation, pass redemption, and merchant result updates.
 
 ## Tech Stack
 
-- React
+- React 18
 - TypeScript
 - Vite
 - Tailwind CSS
-- shadcn/ui-style components
+- shadcn/ui-style primitives
 - React Router
-- TanStack Query
+- Sonner toasts
 - Lucide icons
+- Express
+- OpenAI Node SDK
+- In-memory backend store
 
 ## Getting Started
 
@@ -73,25 +81,59 @@ Install dependencies:
 npm install
 ```
 
-Run locally:
+Create backend environment variables:
 
 ```bash
-npm run dev
+cp .env.example .env
 ```
 
-Run the backend API in a second terminal:
+Edit `.env`:
+
+```bash
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o-mini
+OPENAI_TIMEOUT_MS=8000
+PORT=3001
+HOST=127.0.0.1
+```
+
+`OPENAI_API_KEY` is used only by the backend. Never expose it with a `VITE_` prefix. If the key is missing or the LLM call times out, the backend uses deterministic fallback generation so the demo still works.
+
+Optional frontend event enrichment:
+
+```bash
+VITE_TICKETMASTER_API_KEY=your_ticketmaster_api_key
+```
+
+Run the backend API:
 
 ```bash
 npm run server
 ```
 
-Open the app:
+Run the frontend in a second terminal:
+
+```bash
+npm run dev
+```
+
+Open:
 
 ```txt
 http://localhost:8080/welcome
 ```
 
-If Vite starts on another port, use the URL shown in the terminal.
+## Scripts
+
+```bash
+npm run dev       # Start Vite frontend
+npm run server    # Start Express backend
+npm run dev:api   # Start backend with tsx watch
+npm run build     # Build frontend
+npm run preview   # Preview production build
+npm run lint      # Run ESLint
+npm run test      # Run Vitest
+```
 
 ## Useful Routes
 
@@ -107,133 +149,124 @@ If Vite starts on another port, use the URL shown in the terminal.
 /merchant/profile Merchant profile
 ```
 
-## Environment Variables
+## API Overview
 
-Copy the backend environment template:
-
-```bash
-cp .env.example .env
+```txt
+GET  /api/context/current
+GET  /api/merchant/goal
+POST /api/merchant/goal
+POST /api/offers/generate
+GET  /api/offers/latest
+POST /api/offers/:offerId/activate
+GET  /api/offers/active
+POST /api/wallet/passes
+GET  /api/wallet/passes?userId=u_001
+POST /api/wallet/passes/:passId/redeem
+GET  /api/merchant/results
 ```
 
-Then edit `.env`:
+The route `POST /api/redeem` is kept as a compatibility alias for adding an offer to the wallet. The actual pass redemption step is `POST /api/wallet/passes/:passId/redeem`.
 
-```bash
-OPENAI_API_KEY=your_openai_api_key
-OPENAI_MODEL=gpt-4o-mini
-PORT=3001
-HOST=127.0.0.1
+## Architecture
+
+```mermaid
+flowchart TD
+  W["/welcome<br/>Entry screen"] --> Customer["Customer Mode"]
+  W --> Merchant["Merchant Mode"]
+
+  Customer --> Home["/<br/>AI hero offer"]
+  Customer --> Discover["/discover<br/>Map + offer directory"]
+  Customer --> Passes["/passes<br/>Active / Upcoming / Used"]
+  Customer --> Profile["/profile<br/>Claire Xue"]
+
+  Merchant --> MHome["/merchant<br/>Goal + offer + results"]
+  Merchant --> Goal["/merchant/goal<br/>Goal + guardrails"]
+  Merchant --> Review["/merchant/review<br/>AI offer approval"]
+  Merchant --> MProfile["/merchant/profile<br/>Chloe’s Café"]
+
+  Home --> API["src/lib/api.ts<br/>typed fetch client"]
+  Passes --> API
+  Goal --> API
+  Review --> API
+  MHome --> API
+
+  API --> Express["Express API<br/>server/index.ts"]
+
+  Express --> Store["In-memory store<br/>merchant goal, offers, passes, results"]
+  Express --> Context["Mock city context<br/>weather, demand, activity"]
+  Express --> LLM["LLM offer service<br/>server/services/llmOfferService.ts"]
+  Express --> Guardrails["Guardrail validator<br/>server/services/guardrailValidator.ts"]
+
+  LLM --> OpenAI["OpenAI API<br/>structured JSON offer"]
+  LLM --> Fallback["Deterministic fallback<br/>when key missing or timeout"]
+
+  OpenAI --> Guardrails
+  Fallback --> Guardrails
+  Guardrails --> Store
+  Store --> API
 ```
 
-`OPENAI_API_KEY` is read only by the backend. Do not expose it with a `VITE_` prefix.
-If `OPENAI_API_KEY` is missing, the backend uses a deterministic fallback generator so the full demo flow still works.
+## End-to-End Data Flow
 
-For optional frontend event enrichment, create a local `.env.local` file:
+```mermaid
+sequenceDiagram
+  participant Merchant as Merchant Mode
+  participant API as Express API
+  participant AI as OpenAI or Fallback
+  participant Store as In-memory Store
+  participant Customer as Customer Mode
 
-```bash
-VITE_TICKETMASTER_API_KEY=your_ticketmaster_api_key
-```
-
-The app still runs without this key by using demo/fallback data.
-
-## Build
-
-```bash
-npm run build
-```
-
-Preview production build:
-
-```bash
-npm run preview
+  Merchant->>API: Save goal and guardrails
+  API->>Store: Update merchant goal
+  Merchant->>API: Generate offer
+  API->>AI: Request structured wallet offer
+  AI-->>API: Offer JSON
+  API->>API: Validate guardrails
+  API->>Store: Save draft offer
+  Merchant->>API: Activate offer
+  API->>Store: Mark offer active
+  Customer->>API: Load active offer
+  Customer->>API: Use now / add pass
+  API->>Store: Create active wallet pass
+  Customer->>API: Redeem pass
+  API->>Store: Mark pass used and update results
+  Merchant->>API: Load results
+  API-->>Merchant: Redeemed count and revenue
 ```
 
 ## Project Structure
 
 ```txt
 CityPulse Wallet
-├── /welcome
-│   └── App entry screen
-│       ├── Continue to customer wallet
-│       └── Open Merchant Mode
+├── server/
+│   ├── index.ts                         Express API routes
+│   ├── store.ts                         In-memory demo data
+│   ├── types.ts                         Backend domain types
+│   └── services/
+│       ├── llmOfferService.ts           OpenAI + fallback generation
+│       └── guardrailValidator.ts        Offer safety checks
 │
-├── Customer App
-│   ├── /                  Home
-│   │   ├── live city context
-│   │   ├── AI-matched hero offer
-│   │   └── offer feed
-│   ├── /discover          Offers + live map
-│   ├── /offer/:id         Offer detail
-│   ├── /redeem/:id        Redemption flow
-│   ├── /passes            Active / upcoming / used passes
-│   └── /profile           Customer profile
+├── src/
+│   ├── components/                      Mobile shell, nav, offer cards, map
+│   ├── pages/                           Customer and merchant route screens
+│   ├── lib/
+│   │   ├── api.ts                       Frontend API client
+│   │   ├── offerEngine.ts               Local scoring and copy helpers
+│   │   └── offerDirectory.ts            Category filtering
+│   ├── hooks/                           Weather, local events, offer hooks
+│   ├── data/                            Mock user, merchants, and offers
+│   └── context/                         Locale and app context
 │
-├── Merchant Mode
-│   ├── /merchant          Merchant home
-│   │   ├── current goal
-│   │   ├── AI offer summary
-│   │   └── lightweight results
-│   ├── /merchant/goal     Goal + guardrails setup
-│   ├── /merchant/review   AI offer review
-│   └── /merchant/profile  Merchant profile
-│
-└── Core App Layers
-    ├── src/components/    Shared UI, nav, cards, map, wallet surfaces
-    ├── src/pages/         Route-level screens
-    ├── src/hooks/         Weather, events, and localized offer hooks
-    ├── src/lib/           Offer engine, filtering, geo, weather utilities
-    ├── src/data/          Mock offers and captured demo snapshot
-    └── src/context/       Locale and activity state
+├── .env.example                         Backend env template
+├── vite.config.ts                       Vite + /api proxy
+└── package.json                         Scripts and dependencies
 ```
 
-## Architecture Diagram
+## Why This Fits The Challenge
 
-```mermaid
-flowchart TD
-  W["/welcome\nEntry screen"] --> C["Customer App"]
-  W --> M["Merchant Mode"]
+CityPulse Wallet demonstrates a generative city-wallet experience with both sides of the marketplace:
 
-  C --> CH["/ Home\nCity context + AI hero offer"]
-  C --> CD["/discover\nOffer directory + live map"]
-  C --> CP["/passes\nWallet / passbook"]
-  C --> CR["/redeem/:id\nRedemption flow"]
-
-  M --> MH["/merchant\nGoal → AI offer → results"]
-  M --> MG["/merchant/goal\nGoal + guardrails setup"]
-  M --> MR["/merchant/review\nAI offer review + activation"]
-
-  CH --> H["React hooks"]
-  CD --> H
-  MH --> E["Offer intelligence layer"]
-  MG --> E
-  MR --> E
-
-  H --> HW["useCityWeather"]
-  H --> HE["useLocalEvents"]
-  H --> HO["useLocalizedOffers"]
-
-  HW --> API1["Open-Meteo weather API"]
-  HE --> API2["Ticketmaster / local event signals"]
-  HO --> E
-
-  E --> OE["offerEngine.ts\nscoring + generated offer copy"]
-  E --> OD["offerDirectory.ts\ncategory + contextual filters"]
-  E --> D["data/mock.ts\nbase merchants + offers"]
-  E --> S["liveSnapshot.json\ncaptured demo context"]
-
-  OE --> UI["Wallet-ready offer UI"]
-  OD --> UI
-  D --> UI
-  S --> UI
-```
-
-## Hackathon Story
-
-CityPulse Wallet answers the challenge by showing a working end-to-end MVP:
-
-1. The wallet senses real-time city context.
-2. The customer receives one relevant wallet-ready recommendation.
-3. The merchant does not manually create coupons.
-4. The merchant sets a goal and guardrails.
-5. The AI generates a localized offer and explains why it is safe to activate.
-
-The result is a city wallet experience that feels contextual, useful, and simple for both sides of the local economy.
+- Residents get offers that feel contextual, wallet-native, and immediately usable.
+- Merchants avoid manual coupon creation and instead express goals and guardrails.
+- AI generates the offer, but deterministic validation keeps the result safe.
+- The demo is fully end-to-end: generation, activation, wallet pass creation, redemption, and merchant results.
