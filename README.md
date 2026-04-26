@@ -2,6 +2,8 @@
 
 Created by **Claire Xue** for the DSV-Gruppe **Generative City-Wallet** hackathon challenge.
 
+**Live Demo:** [https://city-pulse-wallet.vercel.app/](https://city-pulse-wallet.vercel.app/)
+
 CityPulse Wallet is an AI-powered city wallet prototype that connects local city context, merchant goals, and wallet-ready customer offers. The demo shows a full loop: a merchant sets a business goal, an LLM generates a guarded offer, the offer is activated into the customer wallet, the user redeems it, and merchant results update.
 
 ## Demo Flow
