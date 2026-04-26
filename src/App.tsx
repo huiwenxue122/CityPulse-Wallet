@@ -13,6 +13,7 @@ import PaymentMethods from "./pages/PaymentMethods.tsx";
 import Merchant from "./pages/Merchant.tsx";
 import MerchantGoal from "./pages/MerchantGoal.tsx";
 import MerchantReview from "./pages/MerchantReview.tsx";
+import Welcome from "./pages/Welcome.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { LocaleProvider } from "./context/LocaleContext";
 import { ActivityProvider } from "./context/ActivityContext";
@@ -28,6 +29,8 @@ const App = () => (
         <ActivityProvider>
           <BrowserRouter>
             <Routes>
+              <Route path="/welcome" element={<Welcome />} />
+              <Route path="/customer" element={<Navigate to="/" replace />} />
               <Route path="/" element={<Index />} />
               <Route path="/discover" element={<Offers />} />
               <Route path="/offers" element={<Navigate to="/discover" replace />} />
