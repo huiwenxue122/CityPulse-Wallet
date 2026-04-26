@@ -16,6 +16,10 @@ Start the app at:
 http://localhost:8080/welcome
 ```
 
+### App Entry Screen
+
+![CityPulse Wallet welcome screen](./welcomepage.png)
+
 Recommended demo path:
 
 1. Enter **Merchant Mode**.
