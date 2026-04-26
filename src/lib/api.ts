@@ -55,10 +55,12 @@ export type ApiMerchantResults = {
   }>;
 };
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
+
 const request = async <T>(path: string, init?: RequestInit, timeoutMs = 20000): Promise<T> => {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
-  const response = await fetch(path, {
+  const response = await fetch(`${apiBaseUrl}${path}`, {
     headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
     signal: controller.signal,
     ...init,
