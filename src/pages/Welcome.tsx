@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Signal, Store, Wallet } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 
-const signals = ["Weather shift", "Nearby demand", "Local merchant goal"];
-
 const Welcome = () => (
   <MobileShell hideNav>
     <main className="relative flex min-h-screen flex-col overflow-hidden px-5 py-8">
@@ -13,46 +11,19 @@ const Welcome = () => (
       <div className="pointer-events-none absolute right-8 top-20 h-2 w-2 rounded-full bg-primary shadow-[0_0_0_8px_hsl(var(--primary)/0.08)]" />
       <div className="pointer-events-none absolute right-16 top-40 h-1.5 w-1.5 rounded-full bg-primary/50 shadow-[0_0_0_7px_hsl(var(--primary)/0.05)]" />
 
-      <section className="relative pt-8">
-        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-[0_14px_30px_hsl(var(--primary)/0.22)]">
-          <Signal className="h-5 w-5" />
+      <section className="relative flex flex-col items-center pt-8 text-center">
+        <div className="grid h-16 w-16 place-items-center rounded-[1.4rem] bg-primary text-primary-foreground shadow-[0_18px_38px_hsl(var(--primary)/0.25)]">
+          <Signal className="h-7 w-7" />
         </div>
-        <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.22em] text-primary">
+        <p className="mt-5 font-display text-[34px] font-extrabold leading-none tracking-tight text-primary">
           CityPulse Wallet
         </p>
-        <h1 className="mt-3 max-w-[19rem] font-display text-[36px] font-extrabold leading-[0.98] text-foreground">
+        <h1 className="mt-3 max-w-[16rem] font-display text-xl font-extrabold leading-tight text-foreground">
           Your city, matched to your moment.
         </h1>
-        <p className="mt-4 max-w-[20rem] text-sm font-semibold leading-relaxed text-muted-foreground">
-          Discover nearby offers, passes, and local experiences powered by live city signals.
-        </p>
       </section>
 
-      <section className="relative mt-7 rounded-[1.65rem] bg-card/82 p-3.5 shadow-[0_14px_34px_hsl(220_30%_8%/0.06)] ring-1 ring-primary/10 backdrop-blur">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="font-display text-[15px] font-extrabold text-foreground">Live around you</p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">
-              CityPulse finds the most relevant offer before you search.
-            </p>
-          </div>
-          <div className="grid h-9 w-9 place-items-center rounded-2xl bg-primary/10">
-            <Signal className="h-4.5 w-4.5 text-primary" />
-          </div>
-        </div>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {signals.map((signal) => (
-            <span
-              key={signal}
-              className="rounded-full bg-primary/[0.055] px-2.5 py-1 text-[10px] font-bold text-primary shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.06)]"
-            >
-              {signal}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      <section className="relative mt-6 flex-1">
+      <section className="relative mt-8 flex-1">
         <div className="rounded-[1.85rem] bg-card/92 p-4 shadow-[0_18px_44px_hsl(220_30%_8%/0.07)] ring-1 ring-border/55">
           <div className="flex items-start gap-3">
             <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.06)]">
