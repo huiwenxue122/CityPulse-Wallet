@@ -18,4 +18,13 @@ jobs:
             exit 1
           fi
 
-          curl --fail --show-error --location --max-time 30 "$RENDER_API_URL/api/context/current"
+          curl \
+            --fail \
+            --show-error \
+            --location \
+            --connect-timeout 20 \
+            --max-time 120 \
+            --retry 3 \
+            --retry-delay 10 \
+            --retry-all-errors \
+            "$RENDER_API_URL/api/context/current"
